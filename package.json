@@ -1,20 +1,23 @@
 {
-    "name": "io.extendreality.tilia.{scope}.{feature}.{platform?}",
-    "displayName": "Tilia {scope}.{feature}.{platform?}",
-    "description": "{Description of feature.}",
+    "name": "io.extendreality.tilia.trackers.pseudobody.unity",
+    "displayName": "Tilia Trackers PseudoBody Unity",
+    "description": "A representation of a collidable body volume that tracks a GameObject in a spatial scene for the Unity software.",
     "version": "1.0.0",
     "unity": "2018.3",
     "unityRelease": "10f1",
     "keywords": [
-        "pattern"
+        "tracker",
+        "body",
+        "pseudo",
+        "representation"
     ],
-    "homepage": "https://github.com/ExtendRealityLtd/Tilia.{scope}.{feature}.{platform?}/",
+    "homepage": "https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/",
     "bugs": {
-        "url": "https://github.com/ExtendRealityLtd/Tilia.{scope}.{feature}.{platform?}/issues"
+        "url": "https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/issues"
     },
     "repository": {
         "type": "git",
-        "url": "ssh://git@github.com/ExtendRealityLtd/Tilia.{scope}.{feature}.{platform?}.git"
+        "url": "ssh://git@github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity.git"
     },
     "license": "MIT",
     "author": {
@@ -23,7 +26,9 @@
         "url": "https://github.com/ExtendRealityLtd"
     },
     "dependencies": {
-        "io.extendreality.zinnia.unity": "X.Y.Z"
+        "io.extendreality.zinnia.unity": "1.14.1",
+        "io.extendreality.tilia.mutators.collisionignorer.unity": "1.1.4",
+        "io.extendreality.tilia.interactions.interactables.unity": "1.5.1"
     },
     "files": [
         "*.md",
