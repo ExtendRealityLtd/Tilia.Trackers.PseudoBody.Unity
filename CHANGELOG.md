@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.0.13](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.0.12...v1.0.13) (2020-05-31)
+
+#### Miscellaneous Chores
+
+* **deps:** bump io.extendreality.zinnia.unity from 1.17.1 to 1.18.0 ([0f44d4e](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/0f44d4e0df754378025353f494f05e067869ec0f))
+  > Bumps [io.extendreality.zinnia.unity](https://github.com/ExtendRealityLtd/Zinnia.Unity) from 1.17.1 to 1.18.0. - [Release notes](https://github.com/ExtendRealityLtd/Zinnia.Unity/releases) - [Changelog](https://github.com/ExtendRealityLtd/Zinnia.Unity/blob/master/CHANGELOG.md) - [Commits](https://github.com/ExtendRealityLtd/Zinnia.Unity/compare/v1.17.1...v1.18.0)
+  > 
+  > Signed-off-by: dependabot-preview[bot] <support@dependabot.com>
+
 ### [1.0.12](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.0.11...v1.0.12) (2020-05-22)
 
 #### Miscellaneous Chores
