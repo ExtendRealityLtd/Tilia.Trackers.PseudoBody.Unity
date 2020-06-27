@@ -6,7 +6,7 @@
     using Malimbe.XmlDocumentationAttribute;
     using System;
     using System.Collections.Generic;
-    using Tilia.Interactions.Interactables;
+    using Tilia.Interactions.Interactables.Interactables;
     using Tilia.Interactions.Interactables.Interactors;
     using UnityEngine;
     using Zinnia.Cast;
