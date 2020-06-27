@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.21](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.0.20...v1.0.21) (2020-06-27)
+
+#### Bug Fixes
+
+* **Interactables:** update Interactables namespace to latest ([3b7dc93](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/3b7dc934b59a44ac1595dc04b6b297133402f5f1))
+  > The Interactables namespace changed in version 1.9.0 of the Interactables package, so it has been updated accordingly.
+
 ### [1.0.20](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.0.19...v1.0.20) (2020-06-21)
 
 #### Miscellaneous Chores
