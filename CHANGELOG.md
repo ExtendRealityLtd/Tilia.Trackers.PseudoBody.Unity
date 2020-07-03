@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.0.21...v1.1.0) (2020-07-03)
+
+#### Features
+
+* **API:** add auto-generated API documentation ([0e683d5](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/0e683d51a8e55d34e8f64b9c60c4860b72da672c))
+  > The API documentation is auto generated with docfx and converted to markdown via turndown in a custom nodejs script.
+
+#### Bug Fixes
+
+* **package.json:** add docfx.json file ([14aeaf1](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/14aeaf16405a3a566fd1612b575167ad4a2c9ae7))
+  > The docfx.json file was missing from the package.json causing the build process to fail. It has now been added.
+
 ### [1.0.21](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.0.20...v1.0.21) (2020-06-27)
 
 #### Bug Fixes
