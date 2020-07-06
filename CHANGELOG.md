@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.3](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.1.2...v1.1.3) (2020-07-06)
+
+#### Bug Fixes
+
+* **Prefabs:** apply correct source objects for collision ignoring ([fb57367](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/fb5736746fb3ca5208570327b120698032931e95))
+  > The Interactor collision ignoring logic was not working because the Collision Ignorer had no source GameObjects to ignore. These have now been set to the CharacterController and CollidableVolume GameObjects as these are the sources that should be ignored from any interactor or grabbed interactable.
+
 ### [1.1.2](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.1.1...v1.1.2) (2020-07-05)
 
 #### Miscellaneous Chores
