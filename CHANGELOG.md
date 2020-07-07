@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.1.4...v1.2.0) (2020-07-07)
+
+#### Features
+
+* **PseudoBodyFacade:** change divergence threshold by UnityEvent ([c3da2e4](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/c3da2e4a3293b1e011247870a16626200d50c38c))
+  > The SourceDivergenceThreshold can now be changed by UnityEvents by calling the relevant component set method.
+
 ### [1.1.4](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.1.3...v1.1.4) (2020-07-07)
 
 #### Miscellaneous Chores
