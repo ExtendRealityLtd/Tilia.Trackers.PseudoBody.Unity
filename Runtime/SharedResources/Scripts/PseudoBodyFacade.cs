@@ -85,6 +85,32 @@
         [field: Header("Reference Settings"), DocumentedByXml, Restricted]
         public PseudoBodyProcessor Processor { get; protected set; }
         #endregion
+        /// <summary>
+        /// Sets the <see cref="SourceDivergenceThreshold"/> x value.
+        /// </summary>
+        /// <param name="value">The value to set to.</param>
+        public virtual void SetSourceDivergenceThresholdX(float value)
+        {
+            SourceDivergenceThreshold = new Vector3(value, SourceDivergenceThreshold.y, SourceDivergenceThreshold.z);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="SourceDivergenceThreshold"/> y value.
+        /// </summary>
+        /// <param name="value">The value to set to.</param>
+        public virtual void SetSourceDivergenceThresholdY(float value)
+        {
+            SourceDivergenceThreshold = new Vector3(SourceDivergenceThreshold.x, value, SourceDivergenceThreshold.z);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="SourceDivergenceThreshold"/> z value.
+        /// </summary>
+        /// <param name="value">The value to set to.</param>
+        public virtual void SetSourceDivergenceThresholdZ(float value)
+        {
+            SourceDivergenceThreshold = new Vector3(SourceDivergenceThreshold.x, SourceDivergenceThreshold.y, value);
+        }
 
         /// <summary>
         /// The object that defines the main source of truth for movement.
