@@ -33,6 +33,9 @@ The public interface for the PseudoBody prefab.
   * [OnEnable()]
   * [OnIgnoredInteractorAdded(InteractorFacade)]
   * [OnIgnoredInteractorRemoved(InteractorFacade)]
+  * [SetSourceDivergenceThresholdX(Single)]
+  * [SetSourceDivergenceThresholdY(Single)]
+  * [SetSourceDivergenceThresholdZ(Single)]
   * [SolveBodyCollisions()]
 
 ## Details
@@ -300,6 +303,54 @@ protected virtual void OnIgnoredInteractorRemoved(InteractorFacade interactor)
 | --- | --- | --- |
 | InteractorFacade | interactor | The interactor to resume collisions with. |
 
+#### SetSourceDivergenceThresholdX(Single)
+
+Sets the [SourceDivergenceThreshold] x value.
+
+##### Declaration
+
+```
+public virtual void SetSourceDivergenceThresholdX(float value)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Single | value | The value to set to. |
+
+#### SetSourceDivergenceThresholdY(Single)
+
+Sets the [SourceDivergenceThreshold] y value.
+
+##### Declaration
+
+```
+public virtual void SetSourceDivergenceThresholdY(float value)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Single | value | The value to set to. |
+
+#### SetSourceDivergenceThresholdZ(Single)
+
+Sets the [SourceDivergenceThreshold] z value.
+
+##### Declaration
+
+```
+public virtual void SetSourceDivergenceThresholdZ(float value)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Single | value | The value to set to. |
+
 #### SolveBodyCollisions()
 
 Solves body collisions by not moving the body in case it can't go to its current position.
@@ -330,6 +381,9 @@ If body collisions should be prevented this method needs to be called right befo
 [Offset]: PseudoBodyFacade.md#Offset
 [Source]: PseudoBodyFacade.md#Source
 [IgnoredInteractors]: PseudoBodyFacade.md#IgnoredInteractors
+[SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
+[SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
+[SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
 [Inheritance]: #Inheritance
 [Namespace]: #Namespace
 [Syntax]: #Syntax
@@ -359,4 +413,7 @@ If body collisions should be prevented this method needs to be called right befo
 [OnEnable()]: #OnEnable
 [OnIgnoredInteractorAdded(InteractorFacade)]: #OnIgnoredInteractorAddedInteractorFacade
 [OnIgnoredInteractorRemoved(InteractorFacade)]: #OnIgnoredInteractorRemovedInteractorFacade
+[SetSourceDivergenceThresholdX(Single)]: #SetSourceDivergenceThresholdXSingle
+[SetSourceDivergenceThresholdY(Single)]: #SetSourceDivergenceThresholdYSingle
+[SetSourceDivergenceThresholdZ(Single)]: #SetSourceDivergenceThresholdZSingle
 [SolveBodyCollisions()]: #SolveBodyCollisions
