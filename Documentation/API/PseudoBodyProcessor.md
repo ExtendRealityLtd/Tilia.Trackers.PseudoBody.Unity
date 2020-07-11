@@ -46,7 +46,6 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [ResumeInteractorsCollisions(InteractorFacade)]
   * [ResumeInteractorUngrabbedCollision(InteractableFacade)]
   * [SolveBodyCollisions()]
-  * [WithinDistance(Vector3, Vector3, Vector3)]
 * [Implements]
 
 ## Details
@@ -480,30 +479,6 @@ public virtual void SolveBodyCollisions()
 
 If body collisions should be prevented this method needs to be called right before or right after applying any form of movement to the body.
 
-#### WithinDistance(Vector3, Vector3, Vector3)
-
-Check whether the source and target points are within a given tolerance distance of each other.
-
-##### Declaration
-
-```
-protected virtual bool WithinDistance(Vector3 source, Vector3 target, Vector3 tolerance)
-```
-
-##### Parameters
-
-| Type | Name | Description |
-| --- | --- | --- |
-| Vector3 | source | The source point. |
-| Vector3 | target | The target point. |
-| Vector3 | tolerance | The tolerance of distance equality. |
-
-##### Returns
-
-| Type | Description |
-| --- | --- |
-| System.Boolean | Whether the source and target are within the distance equality tolerance. |
-
 ### Implements
 
 IProcessable
@@ -577,5 +552,4 @@ IProcessable
 [ResumeInteractorsCollisions(InteractorFacade)]: #ResumeInteractorsCollisionsInteractorFacade
 [ResumeInteractorUngrabbedCollision(InteractableFacade)]: #ResumeInteractorUngrabbedCollisionInteractableFacade
 [SolveBodyCollisions()]: #SolveBodyCollisions
-[WithinDistance(Vector3, Vector3, Vector3)]: #WithinDistanceVector3-Vector3-Vector3
 [Implements]: #Implements
