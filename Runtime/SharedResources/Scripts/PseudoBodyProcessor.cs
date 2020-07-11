@@ -458,7 +458,7 @@
         protected virtual void CheckDivergence()
         {
             wasDiverged = IsDiverged;
-            IsDiverged = !WithinDistance(Facade.Source.transform.position, Character.transform.position + Character.center, Facade.SourceDivergenceThreshold);
+            IsDiverged = !Facade.Source.transform.position.WithinDistance(Character.transform.position + Character.center, Facade.SourceDivergenceThreshold);
 
             if (IsDiverged && !wasDiverged)
             {
@@ -468,18 +468,6 @@
             {
                 Facade.Converged?.Invoke();
             }
-        }
-
-        /// <summary>
-        /// Check whether the source and target points are within a given tolerance distance of each other.
-        /// </summary>
-        /// <param name="source">The source point.</param>
-        /// <param name="target">The target point.</param>
-        /// <param name="tolerance">The tolerance of distance equality.</param>
-        /// <returns>Whether the source and target are within the distance equality tolerance.</returns>
-        protected virtual bool WithinDistance(Vector3 source, Vector3 target, Vector3 tolerance)
-        {
-            return source.x.ApproxEquals(target.x, tolerance.x) && source.y.ApproxEquals(target.y, tolerance.y) && source.z.ApproxEquals(target.z, tolerance.z);
         }
 
         /// <summary>
