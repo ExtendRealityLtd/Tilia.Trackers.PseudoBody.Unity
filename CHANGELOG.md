@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.4](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.2.3...v1.2.4) (2020-07-11)
+
+#### Bug Fixes
+
+* **Processor:** use extension method to calculate within distance ([3d6968f](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/3d6968f9367d8dc8f9718c4a301d99d054086773))
+  > The WithinDistance method has now been removed as this functionality is supported via a Zinnia extension method on the Vector3 type.
+
 ### [1.2.3](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.2.2...v1.2.3) (2020-07-11)
 
 #### Miscellaneous Chores
