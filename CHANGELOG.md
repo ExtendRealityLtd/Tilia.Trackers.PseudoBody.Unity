@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.2.18...v1.3.0) (2020-09-30)
+
+#### Features
+
+* **HowToGuides:** add guide on how to add a pseudo body ([712e985](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/712e98539bb02bd7f14caa51e9f8548376bc2825))
+  > This guide shows how to add a pseudo body tracker.
+
 ### [1.2.18](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.2.17...v1.2.18) (2020-08-29)
 
 #### Miscellaneous Chores
