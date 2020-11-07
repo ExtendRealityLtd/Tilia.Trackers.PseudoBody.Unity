@@ -61,6 +61,11 @@
         [Header("Body Events"), DocumentedByXml]
         public UnityEvent Diverged = new UnityEvent();
         /// <summary>
+        /// Emitted when the pseudo body continues no longer being within the threshold distance of the <see cref="Source."/> for each subsequent frame.
+        /// </summary>
+        [DocumentedByXml]
+        public UnityEvent StillDiverged = new UnityEvent();
+        /// <summary>
         /// Emitted when the pseudo body is back within the threshold distance of the <see cref="Source."/> after being diverged.
         /// </summary>
         [DocumentedByXml]

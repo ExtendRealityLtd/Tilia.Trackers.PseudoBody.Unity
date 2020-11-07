@@ -12,6 +12,7 @@ The public interface for the PseudoBody prefab.
   * [BecameGrounded]
   * [Converged]
   * [Diverged]
+  * [StillDiverged]
 * [Properties]
   * [IgnoredInteractors]
   * [Interest]
@@ -95,6 +96,16 @@ Emitted when the pseudo body starts no longer being within the threshold distanc
 
 ```
 public UnityEvent Diverged
+```
+
+#### StillDiverged
+
+Emitted when the pseudo body continues no longer being within the threshold distance of the Source. for each subsequent frame.
+
+##### Declaration
+
+```
+public UnityEvent StillDiverged
 ```
 
 ### Properties
@@ -392,6 +403,7 @@ If body collisions should be prevented this method needs to be called right befo
 [BecameGrounded]: #BecameGrounded
 [Converged]: #Converged
 [Diverged]: #Diverged
+[StillDiverged]: #StillDiverged
 [Properties]: #Properties
 [IgnoredInteractors]: #IgnoredInteractors
 [Interest]: #Interest

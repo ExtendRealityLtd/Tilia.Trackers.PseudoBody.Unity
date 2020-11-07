@@ -14,6 +14,10 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 
 ### Enums
 
+#### [PseudoBodyProcessor.DivergenceState]
+
+The divergence state of the psuedo body.
+
 #### [PseudoBodyProcessor.MovementInterest]
 
 The object that defines the main source of truth for movement.
@@ -21,4 +25,5 @@ The object that defines the main source of truth for movement.
 [PseudoBodyColliderTag]: PseudoBodyColliderTag.md
 [PseudoBodyFacade]: PseudoBodyFacade.md
 [PseudoBodyProcessor]: PseudoBodyProcessor.md
+[PseudoBodyProcessor.DivergenceState]: PseudoBodyProcessor.DivergenceState.md
 [PseudoBodyProcessor.MovementInterest]: PseudoBodyProcessor.MovementInterest.md
