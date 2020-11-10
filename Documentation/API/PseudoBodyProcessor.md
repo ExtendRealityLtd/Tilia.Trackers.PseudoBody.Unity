@@ -8,6 +8,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 * [Namespace]
 * [Syntax]
 * [Fields]
+  * [checkDivergedAtEndOfFrameRoutine]
   * [collisionResolutionMovement]
   * [ignoredColliders]
   * [ignoreInteractorCollisions]
@@ -21,6 +22,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 * [Properties]
   * [Character]
   * [CollisionsToIgnore]
+  * [CurrentDivergenceState]
   * [Facade]
   * [Interest]
   * [IsCharacterControllerGrounded]
@@ -30,10 +32,12 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 * [Methods]
   * [Awake()]
   * [CheckDivergence()]
+  * [CheckDivergenceAtEndOfFrame()]
   * [CheckIfCharacterControllerIsGrounded()]
   * [ConfigureOffsetObjectFollower()]
   * [ConfigureSourceObjectFollower()]
   * [EmitIsGroundedChangedEvent(Boolean)]
+  * [GetDivergenceState()]
   * [IgnoreInteractorGrabbedCollision(InteractableFacade)]
   * [IgnoreInteractorsCollisions(InteractorFacade)]
   * [MatchCharacterControllerWithSource(Boolean)]
@@ -46,6 +50,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [ResumeInteractorsCollisions(InteractorFacade)]
   * [ResumeInteractorUngrabbedCollision(InteractableFacade)]
   * [SolveBodyCollisions()]
+  * [StopCheckDivergenceAtEndOfFrameRoutine()]
 * [Implements]
 
 ## Details
@@ -70,6 +75,16 @@ public class PseudoBodyProcessor : MonoBehaviour, IProcessable
 ```
 
 ### Fields
+
+#### checkDivergedAtEndOfFrameRoutine
+
+The routine for checking to see if the Facade.Source is still diverged with the [Character] at the end of the frame.
+
+##### Declaration
+
+```
+protected Coroutine checkDivergedAtEndOfFrameRoutine
+```
 
 #### collisionResolutionMovement
 
@@ -193,6 +208,16 @@ A CollisionIgnorer to manage ignoring collisions with the PseudoBody colliders.
 public CollisionIgnorer CollisionsToIgnore { get; protected set; }
 ```
 
+#### CurrentDivergenceState
+
+The current divergence state of the psuedo body.
+
+##### Declaration
+
+```
+public PseudoBodyProcessor.DivergenceState CurrentDivergenceState { get; }
+```
+
 #### Facade
 
 The public interface facade.
@@ -273,6 +298,22 @@ Check to see if the Facade.Source has diverged or converged with the [Character]
 protected virtual void CheckDivergence()
 ```
 
+#### CheckDivergenceAtEndOfFrame()
+
+Check to see if the Facade.Source is still diverged with the [Character] at the end of the frame.
+
+##### Declaration
+
+```
+protected virtual IEnumerator CheckDivergenceAtEndOfFrame()
+```
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Collections.IEnumerator | An Enumerator to manage the running of the Coroutine. |
+
 #### CheckIfCharacterControllerIsGrounded()
 
 Checks whether [Character] is grounded.
@@ -328,6 +369,22 @@ protected virtual void EmitIsGroundedChangedEvent(bool isCharacterControllerGrou
 | Type | Name | Description |
 | --- | --- | --- |
 | System.Boolean | isCharacterControllerGrounded | The current state. |
+
+#### GetDivergenceState()
+
+Determines the divergence state of the psuedo body.
+
+##### Declaration
+
+```
+protected virtual PseudoBodyProcessor.DivergenceState GetDivergenceState()
+```
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| [PseudoBodyProcessor.DivergenceState] | The divergence state. |
 
 #### IgnoreInteractorGrabbedCollision(InteractableFacade)
 
@@ -479,11 +536,22 @@ public virtual void SolveBodyCollisions()
 
 If body collisions should be prevented this method needs to be called right before or right after applying any form of movement to the body.
 
+#### StopCheckDivergenceAtEndOfFrameRoutine()
+
+Stops the divergence check coroutine from running.
+
+##### Declaration
+
+```
+protected virtual void StopCheckDivergenceAtEndOfFrameRoutine()
+```
+
 ### Implements
 
 IProcessable
 
 [Tilia.Trackers.PseudoBody]: README.md
+[Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [Offset]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Offset
 [PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
@@ -500,7 +568,9 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
+[Character]: PseudoBodyProcessor.md#Character
 [BecameAirborne]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_BecameAirborne
+[PseudoBodyProcessor.DivergenceState]: PseudoBodyProcessor.DivergenceState.md
 [Character]: PseudoBodyProcessor.md#Character
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
 [Character]: PseudoBodyProcessor.md#Character
@@ -514,6 +584,7 @@ IProcessable
 [Namespace]: #Namespace
 [Syntax]: #Syntax
 [Fields]: #Fields
+[checkDivergedAtEndOfFrameRoutine]: #checkDivergedAtEndOfFrameRoutine
 [collisionResolutionMovement]: #collisionResolutionMovement
 [ignoredColliders]: #ignoredColliders
 [ignoreInteractorCollisions]: #ignoreInteractorCollisions
@@ -527,6 +598,7 @@ IProcessable
 [Properties]: #Properties
 [Character]: #Character
 [CollisionsToIgnore]: #CollisionsToIgnore
+[CurrentDivergenceState]: #CurrentDivergenceState
 [Facade]: #Facade
 [Interest]: #Interest
 [IsCharacterControllerGrounded]: #IsCharacterControllerGrounded
@@ -536,10 +608,12 @@ IProcessable
 [Methods]: #Methods
 [Awake()]: #Awake
 [CheckDivergence()]: #CheckDivergence
+[CheckDivergenceAtEndOfFrame()]: #CheckDivergenceAtEndOfFrame
 [CheckIfCharacterControllerIsGrounded()]: #CheckIfCharacterControllerIsGrounded
 [ConfigureOffsetObjectFollower()]: #ConfigureOffsetObjectFollower
 [ConfigureSourceObjectFollower()]: #ConfigureSourceObjectFollower
 [EmitIsGroundedChangedEvent(Boolean)]: #EmitIsGroundedChangedEventBoolean
+[GetDivergenceState()]: #GetDivergenceState
 [IgnoreInteractorGrabbedCollision(InteractableFacade)]: #IgnoreInteractorGrabbedCollisionInteractableFacade
 [IgnoreInteractorsCollisions(InteractorFacade)]: #IgnoreInteractorsCollisionsInteractorFacade
 [MatchCharacterControllerWithSource(Boolean)]: #MatchCharacterControllerWithSourceBoolean
@@ -552,4 +626,5 @@ IProcessable
 [ResumeInteractorsCollisions(InteractorFacade)]: #ResumeInteractorsCollisionsInteractorFacade
 [ResumeInteractorUngrabbedCollision(InteractableFacade)]: #ResumeInteractorUngrabbedCollisionInteractableFacade
 [SolveBodyCollisions()]: #SolveBodyCollisions
+[StopCheckDivergenceAtEndOfFrameRoutine()]: #StopCheckDivergenceAtEndOfFrameRoutine
 [Implements]: #Implements

@@ -91,13 +91,13 @@ We can prevent the ability to walk into walls in a number of ways, such as simpl
 
 Let's look at resolving this divergence between the headset and the Pseudo Body collider by setting the user's position back to the safe state that the collider is in.
 
-Select the `Trackers.PseudoBody` GameObject from the Unity Hierarchy and click the `+` symbol in the bottom right corner of the `Diverged` event parameter on the `Pseudo Body Facade` component.
+Select the `Trackers.PseudoBody` GameObject from the Unity Hierarchy and click the `+` symbol in the bottom right corner of the `Still Diverged` event parameter on the `Pseudo Body Facade` component.
 
-Drag and drop the `Trackers.PseudoBody` GameObject into the event listener box that appears on the `Diverged` event parameter on the `Pseudo Body Facade` component that displays `None (Object)`.
+Drag and drop the `Trackers.PseudoBody` GameObject into the event listener box that appears on the `Still Diverged` event parameter on the `Pseudo Body Facade` component that displays `None (Object)`.
 
 ![Drag And Drop Trackers PseudoBody Into Diverged Parameter](assets/images/DragAndDropTrackersPseudoBodyIntoDivergedParameter.png)
 
-Select a function to perform when the `Diverged` event is emitted. For this example, select the `PseudoBodyFacade -> SolveBodyCollisions` function.
+Select a function to perform when the `Still Diverged` event is emitted. For this example, select the `PseudoBodyFacade -> SolveBodyCollisions` function.
 
 ![Select Solve Body Collisions Function](assets/images/SelectSolveBodyCollisionsFunction.png)
 

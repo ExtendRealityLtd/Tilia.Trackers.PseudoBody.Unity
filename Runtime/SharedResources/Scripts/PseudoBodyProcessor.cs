@@ -5,6 +5,7 @@
     using Malimbe.PropertySerializationAttribute;
     using Malimbe.XmlDocumentationAttribute;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using Tilia.Interactions.Interactables.Interactables;
     using Tilia.Interactions.Interactables.Interactors;
@@ -43,6 +44,29 @@
             /// The source of truth for movement comes from <see cref="rigidbody"/> until <see cref="PseudoBodyProcessor.Character"/> hits the ground, then <see cref="PseudoBodyProcessor.Character"/> is the new source of truth.
             /// </summary>
             RigidbodyUntilGrounded
+        }
+
+        /// <summary>
+        /// The divergence state of the psuedo body.
+        /// </summary>
+        public enum DivergenceState
+        {
+            /// <summary>
+            /// The psuedo body is not diverged.
+            /// </summary>
+            NotDiverged,
+            /// <summary>
+            /// the psuedo body has become diverged.
+            /// </summary>
+            BecameDiverged,
+            /// <summary>
+            /// the pseudo body is no longer diverged.
+            /// </summary>
+            BecameConverged,
+            /// <summary>
+            /// the pseudo body is still diverged.
+            /// </summary>
+            StillDiverged
         }
 
         #region Facade Settings
@@ -85,6 +109,10 @@
         /// The object that defines the main source of truth for movement.
         /// </summary>
         public MovementInterest Interest { get; set; } = MovementInterest.CharacterControllerUntilAirborne;
+        /// <summary>
+        /// The current divergence state of the psuedo body.
+        /// </summary>
+        public DivergenceState CurrentDivergenceState => GetDivergenceState();
         /// <summary>
         /// Whether <see cref="Character"/> touches ground.
         /// </summary>
@@ -134,6 +162,10 @@
         /// Whether <see cref="Facade.Source"/> was previously diverged from the <see cref="Character"/>.
         /// </summary>
         protected bool wasDiverged;
+        /// <summary>
+        /// The routine for checking to see if the <see cref="Facade.Source"/> is still diverged with the <see cref="Character"/> at the end of the frame.
+        /// </summary>
+        protected Coroutine checkDivergedAtEndOfFrameRoutine;
 
         /// <summary>
         /// Positions, sizes and controls all variables necessary to make a body representation follow the given <see cref="PseudoBodyFacade.Source"/>.
@@ -302,6 +334,7 @@
 
         protected virtual void OnDisable()
         {
+            StopCheckDivergenceAtEndOfFrameRoutine();
             sourceObjectFollower = null;
             offsetObjectFollower = null;
         }
@@ -453,6 +486,30 @@
         }
 
         /// <summary>
+        /// Determines the divergence state of the psuedo body.
+        /// </summary>
+        /// <returns>The divergence state.</returns>
+        protected virtual DivergenceState GetDivergenceState()
+        {
+            int isDivergedValue = IsDiverged ? 1 : 0;
+            int wasDivergedValue = wasDiverged ? 2 : 0;
+
+            switch (isDivergedValue + wasDivergedValue)
+            {
+                case 0:
+                    return DivergenceState.NotDiverged;
+                case 1:
+                    return DivergenceState.BecameDiverged;
+                case 2:
+                    return DivergenceState.BecameConverged;
+                case 3:
+                    return DivergenceState.StillDiverged;
+            }
+
+            return DivergenceState.NotDiverged;
+        }
+
+        /// <summary>
         /// Check to see if the <see cref="Facade.Source"/> has diverged or converged with the <see cref="Character"/>.
         /// </summary>
         protected virtual void CheckDivergence()
@@ -460,13 +517,45 @@
             wasDiverged = IsDiverged;
             IsDiverged = !Facade.Source.transform.position.WithinDistance(Character.transform.position + Character.center, Facade.SourceDivergenceThreshold);
 
-            if (IsDiverged && !wasDiverged)
+            switch (GetDivergenceState())
             {
-                Facade.Diverged?.Invoke();
+                case DivergenceState.BecameDiverged:
+                    Facade.Diverged?.Invoke();
+                    break;
+                case DivergenceState.StillDiverged:
+                    StopCheckDivergenceAtEndOfFrameRoutine();
+                    checkDivergedAtEndOfFrameRoutine = StartCoroutine(CheckDivergenceAtEndOfFrame());
+                    break;
+                case DivergenceState.BecameConverged:
+                    StopCheckDivergenceAtEndOfFrameRoutine();
+                    Facade.Converged?.Invoke();
+                    break;
             }
-            else if (!IsDiverged && wasDiverged)
+        }
+
+        /// <summary>
+        /// Check to see if the <see cref="Facade.Source"/> is still diverged with the <see cref="Character"/> at the end of the frame.
+        /// </summary>
+        /// <returns>An Enumerator to manage the running of the Coroutine.</returns>
+        protected virtual IEnumerator CheckDivergenceAtEndOfFrame()
+        {
+            yield return new WaitForEndOfFrame();
+            if (IsDiverged)
             {
-                Facade.Converged?.Invoke();
+                Facade.StillDiverged?.Invoke();
+            }
+
+            checkDivergedAtEndOfFrameRoutine = null;
+        }
+
+        /// <summary>
+        /// Stops the divergence check coroutine from running.
+        /// </summary>
+        protected virtual void StopCheckDivergenceAtEndOfFrameRoutine()
+        {
+            if (checkDivergedAtEndOfFrameRoutine != null)
+            {
+                StopCoroutine(checkDivergedAtEndOfFrameRoutine);
             }
         }
 
