@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.3.6...v1.4.0) (2020-11-10)
+
+#### Features
+
+* **HowToGuides:** update adding a pseudo body to use still diverged ([e63c095](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/e63c095eb2b5ef78d8f52b7b2b613d190b80e875))
+  > The StillDiverged event is the more appropriate event to use when calling SolveBodyCollisions as it will keep solving for as long as the diverge continues.
+* **Processor:** add still diverged state ([c9106e2](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/c9106e25d03a4d3292b5ff4264d211f6f203bfe7))
+  > The PseudoBody now has an additional event state to know if the source is still diverged with the character. This is similar to the Unity collision pattern of Enter, Stay, Exit. So now the divergence events are:
+  > 
+  > * Diverged (called once the first time divergence occurs) * StillDiverged (called every frame it is still diverged) * Converged (called once when divergence is no longer occuring)
+  > 
+  > This now enables better checking of divergence state and helps solve body collisions with continuous movements.
+
 ### [1.3.6](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.3.5...v1.3.6) (2020-11-01)
 
 #### Miscellaneous Chores
