@@ -8,11 +8,11 @@
 
 ## Introduction
 
-The Pseudo Body prefab allows us to provide a virtual presence to the user's real world body position in a spatial scene. We can apply in game physics to our body such walking up steps or falling by using the Pseudo Body prefab as it creates a rigidbody that follows our real world head position and translates that into the spatial environment.
+The `Trackers.PseudoBody` prefab allows us to provide a virtual presence to the user's real world body position in a spatial scene. We can apply in game physics to our body such walking up steps or falling by using the `Trackers.PseudoBody` prefab as it creates a `RigidBody` that follows our real world head position and translates that into the spatial environment.
 
 ## Prerequisites
 
-* [Add the Tilia.CameraRigs.TrackedAlias.Unity] prefab to the scene Hierarchy.
+* [Add the Tilia.CameraRigs.TrackedAlias.Unity -> CameraRigs.TrackedAlias] prefab to the scene hierarchy.
 * [Install the Tilia.Trackers.PseudoBody.Unity] package dependency in to your [Unity] project.
 
 ## Let's Start
@@ -59,15 +59,15 @@ Rename the duplicated `Floor (3)` to `Block`.
 
 ### Step 3
 
-Expand the `Tilia Trackers PseudoBody Unity` Package directory in the Unity Project window and select the `Packages -> Tilia Trackers PseudoBody Unity -> Runtime -> Prefabs` directory then drag and drop the `Trackers.PseudoBody` prefab into the Unity Hierarchy window.
+Expand the `Tilia Trackers PseudoBody Unity` package directory in the Unity Project window and select the `Packages -> Tilia Trackers PseudoBody Unity -> Runtime -> Prefabs` directory then drag and drop the `Trackers.PseudoBody` prefab into the Unity Hierarchy window.
 
 ![Drag And Drop Trackers PseudoBody Into Hierarchy](assets/images/DragAndDropTrackersPseudoBodyIntoHierarchy.png)
 
 ### Step 4
 
-We now need to set the `Source` and `Offset` properties of our Pseudo Body prefab. The `Source` determines what GameObject to make the Pseudo Body follow and the `Offset` allows another GameObejct to be used as a positional offset if our `Source` is not centred, such as if the headset is not central to the play area.
+We now need to set the `Source` and `Offset` properties of our Pseudo Body prefab. The `Source` determines what GameObject to make the Pseudo Body follow and the `Offset` allows another GameObejct to be used as a positional offset if our `Source` is not centered, such as if the headset is not central to the play area.
 
-Select the `Trackers.PseudoBody` GameObject from the Unity Hierarchy then drag and drop the `CameraRigs -> Aliases -> HeadsetAlias` GameObject into the `Source` property on the `Pseudo Body Facade` component.
+Select the `Trackers.PseudoBody` GameObject from the Unity Hierarchy window then drag and drop the `CameraRigs -> Aliases -> HeadsetAlias` GameObject into the `Source` property on the `Pseudo Body Facade` component.
 
 > This will set up our headset as the source of our Pseudo Body position, so when the headset moves in the real world then the Pseudo Body will follow it.
 
@@ -91,7 +91,7 @@ We can prevent the ability to walk into walls in a number of ways, such as simpl
 
 Let's look at resolving this divergence between the headset and the Pseudo Body collider by setting the user's position back to the safe state that the collider is in.
 
-Select the `Trackers.PseudoBody` GameObject from the Unity Hierarchy and click the `+` symbol in the bottom right corner of the `Still Diverged` event parameter on the `Pseudo Body Facade` component.
+Select the `Trackers.PseudoBody` GameObject from the Unity Hierarchy window and click the `+` symbol in the bottom right corner of the `Still Diverged` event parameter on the `Pseudo Body Facade` component.
 
 Drag and drop the `Trackers.PseudoBody` GameObject into the event listener box that appears on the `Still Diverged` event parameter on the `Pseudo Body Facade` component that displays `None (Object)`.
 
@@ -109,6 +109,6 @@ Play the Unity scene and you will now notice that when you walk into the block t
 
 ![Resolving Body Collisions](assets/images/ResolvingBodyCollisions.png)
 
-[Add the Tilia.CameraRigs.TrackedAlias.Unity]: https://github.com/ExtendRealityLtd/Tilia.CameraRigs.TrackedAlias.Unity/blob/master/Documentation/HowToGuides/AddingATrackedAlias/README.md
+[Add the Tilia.CameraRigs.TrackedAlias.Unity -> CameraRigs.TrackedAlias]: https://github.com/ExtendRealityLtd/Tilia.CameraRigs.TrackedAlias.Unity/tree/master/Documentation/HowToGuides/AddingATrackedAlias/README.md
 [Install the Tilia.Trackers.PseudoBody.Unity]: ../Installation/README.md
 [Unity]: https://unity3d.com/
