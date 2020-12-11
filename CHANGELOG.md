@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.4.2](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.1...v1.4.2) (2020-12-11)
+
+#### Bug Fixes
+
+* **HowToGuides:** apply document styling guidelines ([a4c816e](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/a4c816e322c503e2967ea645ac8f5196878a2e9c))
+  > The document style guidelines have been updated and now have been applied to the guides in this repo.
+
 ### [1.4.1](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.0...v1.4.1) (2020-11-21)
 
 #### Miscellaneous Chores
