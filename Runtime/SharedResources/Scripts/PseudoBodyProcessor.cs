@@ -7,6 +7,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using Tilia.Interactions.Interactables.Interactables;
     using Tilia.Interactions.Interactables.Interactors;
     using UnityEngine;
@@ -47,16 +48,16 @@
         }
 
         /// <summary>
-        /// The divergence state of the psuedo body.
+        /// The divergence state of the pseudo body.
         /// </summary>
         public enum DivergenceState
         {
             /// <summary>
-            /// The psuedo body is not diverged.
+            /// The pseudo body is not diverged.
             /// </summary>
             NotDiverged,
             /// <summary>
-            /// the psuedo body has become diverged.
+            /// the pseudo body has become diverged.
             /// </summary>
             BecameDiverged,
             /// <summary>
@@ -110,7 +111,7 @@
         /// </summary>
         public MovementInterest Interest { get; set; } = MovementInterest.CharacterControllerUntilAirborne;
         /// <summary>
-        /// The current divergence state of the psuedo body.
+        /// The current divergence state of the pseudo body.
         /// </summary>
         public DivergenceState CurrentDivergenceState => GetDivergenceState();
         /// <summary>
@@ -147,7 +148,7 @@
         /// </summary>
         protected int rigidbodySetFrameCount;
         /// <summary>
-        /// Stores the routine for ignoring interactor collisions.
+        /// Stores the routine for ignoring Interactor collisions.
         /// </summary>
         protected Coroutine ignoreInteractorCollisions;
         /// <summary>
@@ -186,7 +187,7 @@
 
             Vector3 previousCharacterControllerPosition;
 
-            // Handle walking down stairs/slopes and physics affecting the Rigidbody in general.
+            // Handle walking down stairs/slopes and physics affecting the RigidBody in general.
             Vector3 rigidbodyPhysicsMovement = PhysicsBody.position - previousRigidbodyPosition;
             if (Interest == MovementInterest.Rigidbody || Interest == MovementInterest.RigidbodyUntilGrounded)
             {
@@ -209,7 +210,7 @@
 
             bool isGrounded = CheckIfCharacterControllerIsGrounded();
 
-            // Allow moving the Rigidbody via physics.
+            // Allow moving the RigidBody via physics.
             if (Interest == MovementInterest.CharacterControllerUntilAirborne && !isGrounded)
             {
                 Interest = MovementInterest.RigidbodyUntilGrounded;
@@ -298,7 +299,7 @@
         }
 
         /// <summary>
-        /// Ignores all of the colliders on the interactor collection.
+        /// Ignores all of the colliders on the Interactor collection.
         /// </summary>
         public virtual void IgnoreInteractorsCollisions(InteractorFacade interactor)
         {
@@ -308,7 +309,7 @@
         }
 
         /// <summary>
-        /// Resumes all of the colliders on the interactor collection.
+        /// Resumes all of the colliders on the Interactor collection.
         /// </summary>
         public virtual void ResumeInteractorsCollisions(InteractorFacade interactor)
         {
@@ -340,21 +341,24 @@
         }
 
         /// <summary>
-        /// Ignores the interactable grabbed by the interactor.
+        /// Ignores the Interactable grabbed by the Interactor.
         /// </summary>
-        /// <param name="interactable">The interactable to ignore.</param>
+        /// <param name="interactable">The Interactable to ignore.</param>
         protected virtual void IgnoreInteractorGrabbedCollision(InteractableFacade interactable)
         {
             CollisionsToIgnore.RunWhenActiveAndEnabled(() => CollisionsToIgnore.Targets.AddUnique(interactable.gameObject));
         }
 
         /// <summary>
-        /// Resumes the interactable ungrabbed by the interactor.
+        /// Resumes the Interactable ungrabbed by the Interactor.
         /// </summary>
-        /// <param name="interactable">The interactable to resume.</param>
+        /// <param name="interactable">The Interactable to resume.</param>
         protected virtual void ResumeInteractorUngrabbedCollision(InteractableFacade interactable)
         {
-            CollisionsToIgnore.RunWhenActiveAndEnabled(() => CollisionsToIgnore.Targets.Remove(interactable.gameObject));
+            if (interactable.GrabbingInteractors.Count == 0 || !Facade.IgnoredInteractors.NonSubscribableElements.Intersect(interactable.GrabbingInteractors).Any())
+            {
+                CollisionsToIgnore.RunWhenActiveAndEnabled(() => CollisionsToIgnore.Targets.Remove(interactable.gameObject));
+            }
         }
 
         /// <summary>
@@ -486,7 +490,7 @@
         }
 
         /// <summary>
-        /// Determines the divergence state of the psuedo body.
+        /// Determines the divergence state of the pseudo body.
         /// </summary>
         /// <returns>The divergence state.</returns>
         protected virtual DivergenceState GetDivergenceState()

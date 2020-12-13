@@ -9,7 +9,7 @@
 
 # Enum PseudoBodyProcessor.DivergenceState
 
-The divergence state of the psuedo body.
+The divergence state of the pseudo body.
 
 ##### Namespace
 
@@ -26,8 +26,8 @@ public enum DivergenceState
 | Name | Description |
 | --- | --- |
 | BecameConverged | the pseudo body is no longer diverged. |
-| BecameDiverged | the psuedo body has become diverged. |
-| NotDiverged | The psuedo body is not diverged. |
+| BecameDiverged | the pseudo body has become diverged. |
+| NotDiverged | The pseudo body is not diverged. |
 | StillDiverged | the pseudo body is still diverged. |
 
 [Tilia.Trackers.PseudoBody]: README.md

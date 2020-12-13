@@ -112,7 +112,7 @@ public UnityEvent StillDiverged
 
 #### IgnoredInteractors
 
-A collection of interactors to exclude from physics collision checks.
+A collection of Interactors to exclude from physics collision checks.
 
 ##### Declaration
 
@@ -224,7 +224,7 @@ public virtual void ListenToRigidbodyMovement()
 
 ##### Remarks
 
-This method needs to be called right before or right after applying any form of movement to the rigidbody while the body is grounded, i.e. in the same frame and before [Process()] is called.
+This method needs to be called right before or right after applying any form of movement to the Rigidbody while the body is grounded, i.e. in the same frame and before [Process()] is called.
 
 #### OnAfterIgnoredInteractorsChange()
 
@@ -296,7 +296,7 @@ protected virtual void OnIgnoredInteractorAdded(InteractorFacade interactor)
 
 | Type | Name | Description |
 | --- | --- | --- |
-| InteractorFacade | interactor | The interactor to ignore collisions from. |
+| InteractorFacade | interactor | The Interactor to ignore collisions from. |
 
 #### OnIgnoredInteractorRemoved(InteractorFacade)
 
@@ -312,7 +312,7 @@ protected virtual void OnIgnoredInteractorRemoved(InteractorFacade interactor)
 
 | Type | Name | Description |
 | --- | --- | --- |
-| InteractorFacade | interactor | The interactor to resume collisions with. |
+| InteractorFacade | interactor | The Interactor to resume collisions with. |
 
 #### SetSourceDivergenceThresholdX(Single)
 

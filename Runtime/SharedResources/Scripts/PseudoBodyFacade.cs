@@ -47,7 +47,7 @@
 
         #region Interaction Settings
         /// <summary>
-        /// A collection of interactors to exclude from physics collision checks.
+        /// A collection of Interactors to exclude from physics collision checks.
         /// </summary>
         [Serialized]
         [field: Header("Interaction Settings"), DocumentedByXml]
@@ -145,7 +145,7 @@
         /// Sets the source of truth for movement to come from <see cref="PseudoBodyProcessor.PhysicsBody"/> until <see cref="PseudoBodyProcessor.Character"/> hits the ground, then <see cref="PseudoBodyProcessor.Character"/> is the new source of truth.
         /// </summary>
         /// <remarks>
-        /// This method needs to be called right before or right after applying any form of movement to the rigidbody while the body is grounded, i.e. in the same frame and before <see cref="PseudoBodyProcessor.Process"/> is called.
+        /// This method needs to be called right before or right after applying any form of movement to the <see cref="Rigidbody"/> while the body is grounded, i.e. in the same frame and before <see cref="PseudoBodyProcessor.Process"/> is called.
         /// </remarks>
         public virtual void ListenToRigidbodyMovement()
         {
@@ -188,7 +188,7 @@
         /// <summary>
         /// Processes when a new <see cref="InteractorFacade"/> is added to the ignored collection.
         /// </summary>
-        /// <param name="interactor">The interactor to ignore collisions from.</param>
+        /// <param name="interactor">The Interactor to ignore collisions from.</param>
         protected virtual void OnIgnoredInteractorAdded(InteractorFacade interactor)
         {
             Processor.IgnoreInteractorsCollisions(interactor);
@@ -197,7 +197,7 @@
         /// <summary>
         /// Processes when a new <see cref="InteractorFacade"/> is removed from the ignored collection.
         /// </summary>
-        /// <param name="interactor">The interactor to resume collisions with.</param>
+        /// <param name="interactor">The Interactor to resume collisions with.</param>
         protected virtual void OnIgnoredInteractorRemoved(InteractorFacade interactor)
         {
             Processor.ResumeInteractorsCollisions(interactor);
