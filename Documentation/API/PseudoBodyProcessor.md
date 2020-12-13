@@ -108,7 +108,7 @@ protected readonly HashSet<Collider> ignoredColliders
 
 #### ignoreInteractorCollisions
 
-Stores the routine for ignoring interactor collisions.
+Stores the routine for ignoring Interactor collisions.
 
 ##### Declaration
 
@@ -210,7 +210,7 @@ public CollisionIgnorer CollisionsToIgnore { get; protected set; }
 
 #### CurrentDivergenceState
 
-The current divergence state of the psuedo body.
+The current divergence state of the pseudo body.
 
 ##### Declaration
 
@@ -372,7 +372,7 @@ protected virtual void EmitIsGroundedChangedEvent(bool isCharacterControllerGrou
 
 #### GetDivergenceState()
 
-Determines the divergence state of the psuedo body.
+Determines the divergence state of the pseudo body.
 
 ##### Declaration
 
@@ -388,7 +388,7 @@ protected virtual PseudoBodyProcessor.DivergenceState GetDivergenceState()
 
 #### IgnoreInteractorGrabbedCollision(InteractableFacade)
 
-Ignores the interactable grabbed by the interactor.
+Ignores the Interactable grabbed by the Interactor.
 
 ##### Declaration
 
@@ -400,11 +400,11 @@ protected virtual void IgnoreInteractorGrabbedCollision(InteractableFacade inter
 
 | Type | Name | Description |
 | --- | --- | --- |
-| InteractableFacade | interactable | The interactable to ignore. |
+| InteractableFacade | interactable | The Interactable to ignore. |
 
 #### IgnoreInteractorsCollisions(InteractorFacade)
 
-Ignores all of the colliders on the interactor collection.
+Ignores all of the colliders on the Interactor collection.
 
 ##### Declaration
 
@@ -492,7 +492,7 @@ protected virtual void RememberCurrentPositions()
 
 #### ResumeInteractorsCollisions(InteractorFacade)
 
-Resumes all of the colliders on the interactor collection.
+Resumes all of the colliders on the Interactor collection.
 
 ##### Declaration
 
@@ -508,7 +508,7 @@ public virtual void ResumeInteractorsCollisions(InteractorFacade interactor)
 
 #### ResumeInteractorUngrabbedCollision(InteractableFacade)
 
-Resumes the interactable ungrabbed by the interactor.
+Resumes the Interactable ungrabbed by the Interactor.
 
 ##### Declaration
 
@@ -520,7 +520,7 @@ protected virtual void ResumeInteractorUngrabbedCollision(InteractableFacade int
 
 | Type | Name | Description |
 | --- | --- | --- |
-| InteractableFacade | interactable | The interactable to resume. |
+| InteractableFacade | interactable | The Interactable to resume. |
 
 #### SolveBodyCollisions()
 

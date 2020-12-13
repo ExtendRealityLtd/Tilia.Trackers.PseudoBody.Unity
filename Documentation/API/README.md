@@ -16,7 +16,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 
 #### [PseudoBodyProcessor.DivergenceState]
 
-The divergence state of the psuedo body.
+The divergence state of the pseudo body.
 
 #### [PseudoBodyProcessor.MovementInterest]
 
