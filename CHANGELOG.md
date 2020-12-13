@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.4.8](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.7...v1.4.8) (2020-12-13)
+
+#### Bug Fixes
+
+* **Processor:** ensure interactable ungrab is done correctly ([face33c](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/face33c2d45e6e4f24ddb55aaeea0d8f37967e83))
+  > The ignored interactors ungrab mechanism would cause an issue if both interactors were grabbing an interactable as this would successfully ignore the interactable from the pseudobody as expected but if the secondary interactor ungrabbed then it would remove the interactable from the ignored collisions meaning the primary interactor could still collide the interactable with the pseudobody.
+  > 
+  > This has been fixed by guarding the ungrab mechanism.
+
 ### [1.4.7](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.6...v1.4.7) (2020-12-12)
 
 #### Miscellaneous Chores
