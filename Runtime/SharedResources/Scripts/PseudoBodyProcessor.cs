@@ -370,7 +370,7 @@
             Vector3 sourcePosition = Facade.Source.transform.position;
             float height = Facade.Offset == null
                 ? sourcePosition.y
-                : Facade.Offset.transform.InverseTransformPoint(sourcePosition).y;
+                : Facade.Offset.transform.InverseTransformPoint(sourcePosition).y * Facade.Offset.transform.lossyScale.y;
             height -= Character.skinWidth;
 
             // CharacterController enforces a minimum height of twice its radius, so let's match that here.
