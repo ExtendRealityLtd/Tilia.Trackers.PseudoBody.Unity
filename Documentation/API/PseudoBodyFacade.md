@@ -34,6 +34,8 @@ The public interface for the PseudoBody prefab.
   * [OnEnable()]
   * [OnIgnoredInteractorAdded(InteractorFacade)]
   * [OnIgnoredInteractorRemoved(InteractorFacade)]
+  * [SetPosition(Transform)]
+  * [SetPosition(Vector3)]
   * [SetSourceDivergenceThresholdX(Single)]
   * [SetSourceDivergenceThresholdY(Single)]
   * [SetSourceDivergenceThresholdZ(Single)]
@@ -314,6 +316,38 @@ protected virtual void OnIgnoredInteractorRemoved(InteractorFacade interactor)
 | --- | --- | --- |
 | InteractorFacade | interactor | The Interactor to resume collisions with. |
 
+#### SetPosition(Transform)
+
+Sets the position of the pseudo body based on a given Transform position.
+
+##### Declaration
+
+```
+public virtual void SetPosition(Transform position)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Transform | position | The Transform to extract the position from. |
+
+#### SetPosition(Vector3)
+
+Sets the position of the pseudo body.
+
+##### Declaration
+
+```
+public virtual void SetPosition(Vector3 position)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | position | The new position to set to. |
+
 #### SetSourceDivergenceThresholdX(Single)
 
 Sets the [SourceDivergenceThreshold] x value.
@@ -425,6 +459,8 @@ If body collisions should be prevented this method needs to be called right befo
 [OnEnable()]: #OnEnable
 [OnIgnoredInteractorAdded(InteractorFacade)]: #OnIgnoredInteractorAddedInteractorFacade
 [OnIgnoredInteractorRemoved(InteractorFacade)]: #OnIgnoredInteractorRemovedInteractorFacade
+[SetPosition(Transform)]: #SetPositionTransform
+[SetPosition(Vector3)]: #SetPositionVector3
 [SetSourceDivergenceThresholdX(Single)]: #SetSourceDivergenceThresholdXSingle
 [SetSourceDivergenceThresholdY(Single)]: #SetSourceDivergenceThresholdYSingle
 [SetSourceDivergenceThresholdZ(Single)]: #SetSourceDivergenceThresholdZSingle

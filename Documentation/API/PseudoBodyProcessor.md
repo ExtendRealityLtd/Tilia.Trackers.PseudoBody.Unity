@@ -8,12 +8,14 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 * [Namespace]
 * [Syntax]
 * [Fields]
+  * [cachedActiveState]
   * [checkDivergedAtEndOfFrameRoutine]
   * [collisionResolutionMovement]
   * [ignoredColliders]
   * [ignoreInteractorCollisions]
   * [offsetObjectFollower]
   * [previousRigidbodyPosition]
+  * [ResetCachedStateRoutine]
   * [restoreColliders]
   * [rigidbodySetFrameCount]
   * [sourceObjectFollower]
@@ -47,8 +49,10 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [OnEnable()]
   * [Process()]
   * [RememberCurrentPositions()]
+  * [ResetCachedState()]
   * [ResumeInteractorsCollisions(InteractorFacade)]
   * [ResumeInteractorUngrabbedCollision(InteractableFacade)]
+  * [SetPosition(Vector3)]
   * [SolveBodyCollisions()]
   * [StopCheckDivergenceAtEndOfFrameRoutine()]
 * [Implements]
@@ -75,6 +79,16 @@ public class PseudoBodyProcessor : MonoBehaviour, IProcessable
 ```
 
 ### Fields
+
+#### cachedActiveState
+
+The cached active state of this GameObject.
+
+##### Declaration
+
+```
+protected bool cachedActiveState
+```
 
 #### checkDivergedAtEndOfFrameRoutine
 
@@ -134,6 +148,16 @@ The previous position of [PhysicsBody].
 
 ```
 protected Vector3 previousRigidbodyPosition
+```
+
+#### ResetCachedStateRoutine
+
+The routine for resetting the cached state after the end of the frame.
+
+##### Declaration
+
+```
+protected Coroutine ResetCachedStateRoutine
 ```
 
 #### restoreColliders
@@ -490,6 +514,22 @@ Updates the previous position variables to remember the current state.
 protected virtual void RememberCurrentPositions()
 ```
 
+#### ResetCachedState()
+
+Resets the cached state of this GameObject.
+
+##### Declaration
+
+```
+protected virtual IEnumerator ResetCachedState()
+```
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Collections.IEnumerator | An Enumerator to manage the running of the Coroutine. |
+
 #### ResumeInteractorsCollisions(InteractorFacade)
 
 Resumes all of the colliders on the Interactor collection.
@@ -521,6 +561,22 @@ protected virtual void ResumeInteractorUngrabbedCollision(InteractableFacade int
 | Type | Name | Description |
 | --- | --- | --- |
 | InteractableFacade | interactable | The Interactable to resume. |
+
+#### SetPosition(Vector3)
+
+Sets the position of the [Character] and [PhysicsBody].
+
+##### Declaration
+
+```
+public virtual void SetPosition(Vector3 position)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | position | The position to set to. |
 
 #### SolveBodyCollisions()
 
@@ -580,16 +636,20 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Interest]: PseudoBodyProcessor.md#Interest
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
+[Character]: PseudoBodyProcessor.md#Character
+[PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
 [Inheritance]: #Inheritance
 [Namespace]: #Namespace
 [Syntax]: #Syntax
 [Fields]: #Fields
+[cachedActiveState]: #cachedActiveState
 [checkDivergedAtEndOfFrameRoutine]: #checkDivergedAtEndOfFrameRoutine
 [collisionResolutionMovement]: #collisionResolutionMovement
 [ignoredColliders]: #ignoredColliders
 [ignoreInteractorCollisions]: #ignoreInteractorCollisions
 [offsetObjectFollower]: #offsetObjectFollower
 [previousRigidbodyPosition]: #previousRigidbodyPosition
+[ResetCachedStateRoutine]: #ResetCachedStateRoutine
 [restoreColliders]: #restoreColliders
 [rigidbodySetFrameCount]: #rigidbodySetFrameCount
 [sourceObjectFollower]: #sourceObjectFollower
@@ -623,8 +683,10 @@ IProcessable
 [OnEnable()]: #OnEnable
 [Process()]: #Process
 [RememberCurrentPositions()]: #RememberCurrentPositions
+[ResetCachedState()]: #ResetCachedState
 [ResumeInteractorsCollisions(InteractorFacade)]: #ResumeInteractorsCollisionsInteractorFacade
 [ResumeInteractorUngrabbedCollision(InteractableFacade)]: #ResumeInteractorUngrabbedCollisionInteractableFacade
+[SetPosition(Vector3)]: #SetPositionVector3
 [SolveBodyCollisions()]: #SolveBodyCollisions
 [StopCheckDivergenceAtEndOfFrameRoutine()]: #StopCheckDivergenceAtEndOfFrameRoutine
 [Implements]: #Implements

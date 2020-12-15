@@ -167,6 +167,14 @@
         /// The routine for checking to see if the <see cref="Facade.Source"/> is still diverged with the <see cref="Character"/> at the end of the frame.
         /// </summary>
         protected Coroutine checkDivergedAtEndOfFrameRoutine;
+        /// <summary>
+        /// The cached active state of this <see cref="GameObject"/>.
+        /// </summary>
+        protected bool cachedActiveState;
+        /// <summary>
+        /// The routine for resetting the cached state after the end of the frame.
+        /// </summary>
+        protected Coroutine ResetCachedStateRoutine;
 
         /// <summary>
         /// Positions, sizes and controls all variables necessary to make a body representation follow the given <see cref="PseudoBodyFacade.Source"/>.
@@ -318,6 +326,25 @@
             interactor.Ungrabbed.RemoveListener(ResumeInteractorUngrabbedCollision);
         }
 
+        /// <summary>
+        /// Sets the position of the <see cref="Character"/> and <see cref="PhysicsBody"/>.
+        /// </summary>
+        /// <param name="position">The position to set to.</param>
+        [RequiresBehaviourState]
+        public virtual void SetPosition(Vector3 position)
+        {
+            if (ResetCachedStateRoutine != null)
+            {
+                StopCoroutine(ResetCachedStateRoutine);
+            }
+
+            cachedActiveState = Facade.gameObject.activeInHierarchy;
+            ResetCachedStateRoutine = StartCoroutine(ResetCachedState());
+            gameObject.SetActive(false);
+            Character.transform.position = position;
+            PhysicsBody.transform.position = position;
+        }
+
         protected virtual void Awake()
         {
             Physics.IgnoreCollision(Character, RigidbodyCollider, true);
@@ -336,8 +363,10 @@
         protected virtual void OnDisable()
         {
             StopCheckDivergenceAtEndOfFrameRoutine();
+            StopCoroutine(ResetCachedStateRoutine);
             sourceObjectFollower = null;
             offsetObjectFollower = null;
+            cachedActiveState = false;
         }
 
         /// <summary>
@@ -561,6 +590,17 @@
             {
                 StopCoroutine(checkDivergedAtEndOfFrameRoutine);
             }
+        }
+
+        /// <summary>
+        /// Resets the cached state of this <see cref="GameObject"/>.
+        /// </summary>
+        /// <returns>An Enumerator to manage the running of the Coroutine.</returns>
+        protected virtual IEnumerator ResetCachedState()
+        {
+            yield return new WaitForEndOfFrame();
+            Facade.gameObject.SetActive(cachedActiveState);
+            ResetCachedStateRoutine = null;
         }
 
         /// <summary>

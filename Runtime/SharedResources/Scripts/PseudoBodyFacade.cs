@@ -163,6 +163,24 @@
             Processor.SolveBodyCollisions();
         }
 
+        /// <summary>
+        /// Sets the position of the pseudo body.
+        /// </summary>
+        /// <param name="position">The new position to set to.</param>
+        public virtual void SetPosition(Vector3 position)
+        {
+            Processor.SetPosition(position);
+        }
+
+        /// <summary>
+        /// Sets the position of the pseudo body based on a given <see cref="Transform"/> position.
+        /// </summary>
+        /// <param name="position">The <see cref="Transform"/> to extract the position from.</param>
+        public virtual void SetPosition(Transform position)
+        {
+            Processor.SetPosition(position.position);
+        }
+
         protected virtual void OnEnable()
         {
             if (IgnoredInteractors == null)
