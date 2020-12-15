@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.4.10](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.9...v1.4.10) (2020-12-15)
+
+#### Bug Fixes
+
+* **Processor:** use offset scale when calculating height ([5537763](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/553776300b0e87e3e7e1a6817671d63aa2458709))
+  > There was an issue when the offset scale was larger than 1 then the height calculation would cause the rigidbody position to be set incorrectly which would infinitely increase the y position of the character controller. This would cause the target to be flung in the air. This fix ensures the height is calculated from the offset Y position but taking into consideration any scaling on the offset.
+
 ### [1.4.9](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.8...v1.4.9) (2020-12-13)
 
 #### Miscellaneous Chores
