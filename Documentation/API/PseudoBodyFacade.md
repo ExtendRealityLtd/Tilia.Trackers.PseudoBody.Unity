@@ -14,6 +14,7 @@ The public interface for the PseudoBody prefab.
   * [Diverged]
   * [StillDiverged]
 * [Properties]
+  * [IgnoredGameObjects]
   * [IgnoredInteractors]
   * [Interest]
   * [IsCharacterControllerGrounded]
@@ -25,15 +26,10 @@ The public interface for the PseudoBody prefab.
   * [SourceDivergenceThreshold]
   * [SourceThickness]
 * [Methods]
+  * [Awake()]
   * [ListenToRigidbodyMovement()]
-  * [OnAfterIgnoredInteractorsChange()]
   * [OnAfterOffsetChange()]
   * [OnAfterSourceChange()]
-  * [OnBeforeIgnoredInteractorsChange()]
-  * [OnDisable()]
-  * [OnEnable()]
-  * [OnIgnoredInteractorAdded(InteractorFacade)]
-  * [OnIgnoredInteractorRemoved(InteractorFacade)]
   * [SetSourceDivergenceThresholdX(Single)]
   * [SetSourceDivergenceThresholdY(Single)]
   * [SetSourceDivergenceThresholdZ(Single)]
@@ -110,6 +106,16 @@ public UnityEvent StillDiverged
 
 ### Properties
 
+#### IgnoredGameObjects
+
+A GameObject collection to exclude from physics collision checks.
+
+##### Declaration
+
+```
+public GameObjectObservableList IgnoredGameObjects { get; set; }
+```
+
 #### IgnoredInteractors
 
 A collection of Interactors to exclude from physics collision checks.
@@ -117,6 +123,7 @@ A collection of Interactors to exclude from physics collision checks.
 ##### Declaration
 
 ```
+[Obsolete("Use `IgnoredGameObjects` instead.")]
 public InteractorFacadeObservableList IgnoredInteractors { get; set; }
 ```
 
@@ -212,6 +219,14 @@ public float SourceThickness { get; set; }
 
 ### Methods
 
+#### Awake()
+
+##### Declaration
+
+```
+protected virtual void Awake()
+```
+
 #### ListenToRigidbodyMovement()
 
 Sets the source of truth for movement to come from [PhysicsBody] until [Character] hits the ground, then [Character] is the new source of truth.
@@ -225,16 +240,6 @@ public virtual void ListenToRigidbodyMovement()
 ##### Remarks
 
 This method needs to be called right before or right after applying any form of movement to the Rigidbody while the body is grounded, i.e. in the same frame and before [Process()] is called.
-
-#### OnAfterIgnoredInteractorsChange()
-
-Called after [IgnoredInteractors] has been changed.
-
-##### Declaration
-
-```
-protected virtual void OnAfterIgnoredInteractorsChange()
-```
 
 #### OnAfterOffsetChange()
 
@@ -255,64 +260,6 @@ Called after [Source] has been changed.
 ```
 protected virtual void OnAfterSourceChange()
 ```
-
-#### OnBeforeIgnoredInteractorsChange()
-
-Called after [IgnoredInteractors] has been changed.
-
-##### Declaration
-
-```
-protected virtual void OnBeforeIgnoredInteractorsChange()
-```
-
-#### OnDisable()
-
-##### Declaration
-
-```
-protected virtual void OnDisable()
-```
-
-#### OnEnable()
-
-##### Declaration
-
-```
-protected virtual void OnEnable()
-```
-
-#### OnIgnoredInteractorAdded(InteractorFacade)
-
-Processes when a new InteractorFacade is added to the ignored collection.
-
-##### Declaration
-
-```
-protected virtual void OnIgnoredInteractorAdded(InteractorFacade interactor)
-```
-
-##### Parameters
-
-| Type | Name | Description |
-| --- | --- | --- |
-| InteractorFacade | interactor | The Interactor to ignore collisions from. |
-
-#### OnIgnoredInteractorRemoved(InteractorFacade)
-
-Processes when a new InteractorFacade is removed from the ignored collection.
-
-##### Declaration
-
-```
-protected virtual void OnIgnoredInteractorRemoved(InteractorFacade interactor)
-```
-
-##### Parameters
-
-| Type | Name | Description |
-| --- | --- | --- |
-| InteractorFacade | interactor | The Interactor to resume collisions with. |
 
 #### SetSourceDivergenceThresholdX(Single)
 
@@ -388,10 +335,8 @@ If body collisions should be prevented this method needs to be called right befo
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
 [Process()]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Process
-[IgnoredInteractors]: PseudoBodyFacade.md#IgnoredInteractors
 [Offset]: PseudoBodyFacade.md#Offset
 [Source]: PseudoBodyFacade.md#Source
-[IgnoredInteractors]: PseudoBodyFacade.md#IgnoredInteractors
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
@@ -405,6 +350,7 @@ If body collisions should be prevented this method needs to be called right befo
 [Diverged]: #Diverged
 [StillDiverged]: #StillDiverged
 [Properties]: #Properties
+[IgnoredGameObjects]: #IgnoredGameObjects
 [IgnoredInteractors]: #IgnoredInteractors
 [Interest]: #Interest
 [IsCharacterControllerGrounded]: #IsCharacterControllerGrounded
@@ -416,15 +362,10 @@ If body collisions should be prevented this method needs to be called right befo
 [SourceDivergenceThreshold]: #SourceDivergenceThreshold
 [SourceThickness]: #SourceThickness
 [Methods]: #Methods
+[Awake()]: #Awake
 [ListenToRigidbodyMovement()]: #ListenToRigidbodyMovement
-[OnAfterIgnoredInteractorsChange()]: #OnAfterIgnoredInteractorsChange
 [OnAfterOffsetChange()]: #OnAfterOffsetChange
 [OnAfterSourceChange()]: #OnAfterSourceChange
-[OnBeforeIgnoredInteractorsChange()]: #OnBeforeIgnoredInteractorsChange
-[OnDisable()]: #OnDisable
-[OnEnable()]: #OnEnable
-[OnIgnoredInteractorAdded(InteractorFacade)]: #OnIgnoredInteractorAddedInteractorFacade
-[OnIgnoredInteractorRemoved(InteractorFacade)]: #OnIgnoredInteractorRemovedInteractorFacade
 [SetSourceDivergenceThresholdX(Single)]: #SetSourceDivergenceThresholdXSingle
 [SetSourceDivergenceThresholdY(Single)]: #SetSourceDivergenceThresholdYSingle
 [SetSourceDivergenceThresholdZ(Single)]: #SetSourceDivergenceThresholdZSingle

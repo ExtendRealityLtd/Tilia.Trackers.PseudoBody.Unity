@@ -38,7 +38,9 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [ConfigureSourceObjectFollower()]
   * [EmitIsGroundedChangedEvent(Boolean)]
   * [GetDivergenceState()]
+  * [GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade>)]
   * [IgnoreInteractorGrabbedCollision(InteractableFacade)]
+  * [IgnoreInteractorsCollisions(GameObject)]
   * [IgnoreInteractorsCollisions(InteractorFacade)]
   * [MatchCharacterControllerWithSource(Boolean)]
   * [MatchRigidbodyAndColliderWithCharacterController()]
@@ -47,6 +49,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [OnEnable()]
   * [Process()]
   * [RememberCurrentPositions()]
+  * [ResumeInteractorsCollisions(GameObject)]
   * [ResumeInteractorsCollisions(InteractorFacade)]
   * [ResumeInteractorUngrabbedCollision(InteractableFacade)]
   * [SolveBodyCollisions()]
@@ -386,6 +389,28 @@ protected virtual PseudoBodyProcessor.DivergenceState GetDivergenceState()
 | --- | --- |
 | [PseudoBodyProcessor.DivergenceState] | The divergence state. |
 
+#### GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade>)
+
+Converts the InteractorFacade collection to a GameObject collection.
+
+##### Declaration
+
+```
+protected virtual IReadOnlyList<GameObject> GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade> interactorList)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Collections.Generic.IReadOnlyList<InteractorFacade\> | interactorList | The list to convert. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Collections.Generic.IReadOnlyList<GameObject\> | The converted list. |
+
 #### IgnoreInteractorGrabbedCollision(InteractableFacade)
 
 Ignores the Interactable grabbed by the Interactor.
@@ -402,6 +427,22 @@ protected virtual void IgnoreInteractorGrabbedCollision(InteractableFacade inter
 | --- | --- | --- |
 | InteractableFacade | interactable | The Interactable to ignore. |
 
+#### IgnoreInteractorsCollisions(GameObject)
+
+Ignores all collisions between any found Interactor and this PsuedoBody.
+
+##### Declaration
+
+```
+public virtual void IgnoreInteractorsCollisions(GameObject ignoredObject)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| GameObject | ignoredObject | The object to ignore. |
+
 #### IgnoreInteractorsCollisions(InteractorFacade)
 
 Ignores all of the colliders on the Interactor collection.
@@ -409,6 +450,7 @@ Ignores all of the colliders on the Interactor collection.
 ##### Declaration
 
 ```
+[Obsolete("Add `InteractorFacade.gameObject` to `PseudoBodyProcessor.CollisionsToIgnore.Targets` instead.")]
 public virtual void IgnoreInteractorsCollisions(InteractorFacade interactor)
 ```
 
@@ -490,6 +532,22 @@ Updates the previous position variables to remember the current state.
 protected virtual void RememberCurrentPositions()
 ```
 
+#### ResumeInteractorsCollisions(GameObject)
+
+Resumes all collisions between any found Interactor and this PsuedoBody.
+
+##### Declaration
+
+```
+public virtual void ResumeInteractorsCollisions(GameObject ignoredObject)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| GameObject | ignoredObject | The object being ignored. |
+
 #### ResumeInteractorsCollisions(InteractorFacade)
 
 Resumes all of the colliders on the Interactor collection.
@@ -497,6 +555,7 @@ Resumes all of the colliders on the Interactor collection.
 ##### Declaration
 
 ```
+[Obsolete("Remove `InteractorFacade.gameObject` to `PseudoBodyProcessor.CollisionsToIgnore.Targets` instead.")]
 public virtual void ResumeInteractorsCollisions(InteractorFacade interactor)
 ```
 
@@ -614,7 +673,9 @@ IProcessable
 [ConfigureSourceObjectFollower()]: #ConfigureSourceObjectFollower
 [EmitIsGroundedChangedEvent(Boolean)]: #EmitIsGroundedChangedEventBoolean
 [GetDivergenceState()]: #GetDivergenceState
+[GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade>)]: #GetGameObjectListFromInteractorFacadeListIReadOnlyList<InteractorFacade>
 [IgnoreInteractorGrabbedCollision(InteractableFacade)]: #IgnoreInteractorGrabbedCollisionInteractableFacade
+[IgnoreInteractorsCollisions(GameObject)]: #IgnoreInteractorsCollisionsGameObject
 [IgnoreInteractorsCollisions(InteractorFacade)]: #IgnoreInteractorsCollisionsInteractorFacade
 [MatchCharacterControllerWithSource(Boolean)]: #MatchCharacterControllerWithSourceBoolean
 [MatchRigidbodyAndColliderWithCharacterController()]: #MatchRigidbodyAndColliderWithCharacterController
@@ -623,6 +684,7 @@ IProcessable
 [OnEnable()]: #OnEnable
 [Process()]: #Process
 [RememberCurrentPositions()]: #RememberCurrentPositions
+[ResumeInteractorsCollisions(GameObject)]: #ResumeInteractorsCollisionsGameObject
 [ResumeInteractorsCollisions(InteractorFacade)]: #ResumeInteractorsCollisionsInteractorFacade
 [ResumeInteractorUngrabbedCollision(InteractableFacade)]: #ResumeInteractorUngrabbedCollisionInteractableFacade
 [SolveBodyCollisions()]: #SolveBodyCollisions
