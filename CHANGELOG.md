@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.22...v1.5.0) (2021-01-31)
+
+#### Features
+
+* **Trackers:** allow any GameObject collision to be ignored ([b8562f9](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/b8562f9be5d67a8a5a66f9667fc333687e2b04d4))
+  > Previously, the PsuedoBodyFacade would only allow Interactors to be directly ignored (with having to add other objects to the internal Collision Ignorer). The `IgnoredInteractors` property has now been deprecated and in place is a new `IgnoredGameObjects` property which can have the Interactors added to as before and it still applies the same logic on to any grabbed Interactable.
+  > 
+  > However, now if an Interactable is added to the `IgnoredGameObjects` property then it will always be ignored whereas previously if the Interactor in the `IgnoredInteractors` property grabbed and released an Interactable that was added to the internal Collision Ignorer then the Interactable would be removed from the Collision Ignorer.
+  > 
+  > Due to `IgnoredInteractors` being deprecated, this means the option on the facade is now restricted and the internal list items cannot be accessed from the PsuedoBodyFacade component in the Unity inspector.
+  > 
+  > Any items in this list will show a deprecation warning. Going to the internal `[Deprecated]IgnoredInteractors` GameObject and accessing the InteractorFacadeObservableList component from there will allow the deprecated list contents to be removed and then these items can be manually added to the new `IgnoredGameObjects` property.
+
 ### [1.4.22](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.4.21...v1.4.22) (2021-01-07)
 
 #### Miscellaneous Chores
