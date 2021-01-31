@@ -299,23 +299,49 @@
         }
 
         /// <summary>
+        /// Ignores all collisions between any found Interactor and this PsuedoBody.
+        /// </summary>
+        /// <param name="ignoredObject">The object to ignore.</param>
+        public virtual void IgnoreInteractorsCollisions(GameObject ignoredObject)
+        {
+            InteractorFacade interactor = ignoredObject.GetComponent<InteractorFacade>();
+            if (interactor != null)
+            {
+                interactor.Grabbed.AddListener(IgnoreInteractorGrabbedCollision);
+                interactor.Ungrabbed.AddListener(ResumeInteractorUngrabbedCollision);
+            }
+        }
+
+        /// <summary>
+        /// Resumes all collisions between any found Interactor and this PsuedoBody.
+        /// </summary>
+        /// <param name="ignoredObject">The object being ignored.</param>
+        public virtual void ResumeInteractorsCollisions(GameObject ignoredObject)
+        {
+            InteractorFacade interactor = ignoredObject.GetComponent<InteractorFacade>();
+            if (interactor != null)
+            {
+                interactor.Grabbed.RemoveListener(IgnoreInteractorGrabbedCollision);
+                interactor.Ungrabbed.RemoveListener(ResumeInteractorUngrabbedCollision);
+            }
+        }
+
+        /// <summary>
         /// Ignores all of the colliders on the Interactor collection.
         /// </summary>
+        [Obsolete("Add `InteractorFacade.gameObject` to `PseudoBodyProcessor.CollisionsToIgnore.Targets` instead.")]
         public virtual void IgnoreInteractorsCollisions(InteractorFacade interactor)
         {
             CollisionsToIgnore.RunWhenActiveAndEnabled(() => CollisionsToIgnore.Targets.AddUnique(interactor.gameObject));
-            interactor.Grabbed.AddListener(IgnoreInteractorGrabbedCollision);
-            interactor.Ungrabbed.AddListener(ResumeInteractorUngrabbedCollision);
         }
 
         /// <summary>
         /// Resumes all of the colliders on the Interactor collection.
         /// </summary>
+        [Obsolete("Remove `InteractorFacade.gameObject` to `PseudoBodyProcessor.CollisionsToIgnore.Targets` instead.")]
         public virtual void ResumeInteractorsCollisions(InteractorFacade interactor)
         {
             CollisionsToIgnore.RunWhenActiveAndEnabled(() => CollisionsToIgnore.Targets.Remove(interactor.gameObject));
-            interactor.Grabbed.RemoveListener(IgnoreInteractorGrabbedCollision);
-            interactor.Ungrabbed.RemoveListener(ResumeInteractorUngrabbedCollision);
         }
 
         protected virtual void Awake()
@@ -355,10 +381,30 @@
         /// <param name="interactable">The Interactable to resume.</param>
         protected virtual void ResumeInteractorUngrabbedCollision(InteractableFacade interactable)
         {
-            if (interactable.GrabbingInteractors.Count == 0 || !Facade.IgnoredInteractors.NonSubscribableElements.Intersect(interactable.GrabbingInteractors).Any())
+            if (!Facade.IgnoredGameObjects.Contains(interactable.gameObject) &&
+                (
+                interactable.GrabbingInteractors.Count == 0 ||
+                !Facade.IgnoredGameObjects.NonSubscribableElements.Intersect(GetGameObjectListFromInteractorFacadeList(interactable.GrabbingInteractors)).Any())
+                )
             {
                 CollisionsToIgnore.RunWhenActiveAndEnabled(() => CollisionsToIgnore.Targets.Remove(interactable.gameObject));
             }
+        }
+
+        /// <summary>
+        /// Converts the <see cref="InteractorFacade"/> collection to a <see cref="GameObject"/> collection.
+        /// </summary>
+        /// <param name="interactorList">The list to convert.</param>
+        /// <returns>The converted list.</returns>
+        protected virtual IReadOnlyList<GameObject> GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade> interactorList)
+        {
+            List<GameObject> gameObjectList = new List<GameObject>();
+            foreach (InteractorFacade interactor in interactorList)
+            {
+                gameObjectList.Add(interactor.gameObject);
+            }
+
+            return gameObjectList;
         }
 
         /// <summary>

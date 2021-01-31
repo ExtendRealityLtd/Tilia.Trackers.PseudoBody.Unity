@@ -4,11 +4,12 @@
     using Malimbe.MemberClearanceMethod;
     using Malimbe.PropertySerializationAttribute;
     using Malimbe.XmlDocumentationAttribute;
-    using Tilia.Interactions.Interactables.Interactors;
+    using System;
     using Tilia.Interactions.Interactables.Interactors.Collection;
     using UnityEngine;
     using UnityEngine.Events;
     using Zinnia.Data.Attribute;
+    using Zinnia.Data.Collection.List;
 
     /// <summary>
     /// The public interface for the PseudoBody prefab.
@@ -50,8 +51,15 @@
         /// A collection of Interactors to exclude from physics collision checks.
         /// </summary>
         [Serialized]
-        [field: Header("Interaction Settings"), DocumentedByXml]
+        [field: Header("Interaction Settings"), DocumentedByXml, Restricted]
+        [Obsolete("Use `IgnoredGameObjects` instead.")]
         public InteractorFacadeObservableList IgnoredInteractors { get; set; }
+        /// <summary>
+        /// A <see cref="GameObject"/> collection to exclude from physics collision checks.
+        /// </summary>
+        [Serialized]
+        [field: DocumentedByXml]
+        public GameObjectObservableList IgnoredGameObjects { get; set; }
         #endregion
 
         #region Body Events
@@ -163,44 +171,14 @@
             Processor.SolveBodyCollisions();
         }
 
-        protected virtual void OnEnable()
+        protected virtual void Awake()
         {
-            if (IgnoredInteractors == null)
+#pragma warning disable 0618
+            if (IgnoredInteractors.NonSubscribableElements.Count > 0)
             {
-                return;
+                Debug.LogWarning("`PsuedoBodyFacade.IgnoredInteractors` list has been deprecated. Use the `PsuedoBodyFacade.IgnoredGameObjects` list instead.", gameObject);
             }
-
-            IgnoredInteractors.Added.AddListener(OnIgnoredInteractorAdded);
-            IgnoredInteractors.Removed.AddListener(OnIgnoredInteractorRemoved);
-        }
-
-        protected virtual void OnDisable()
-        {
-            if (IgnoredInteractors == null)
-            {
-                return;
-            }
-
-            IgnoredInteractors.Added.RemoveListener(OnIgnoredInteractorAdded);
-            IgnoredInteractors.Removed.RemoveListener(OnIgnoredInteractorRemoved);
-        }
-
-        /// <summary>
-        /// Processes when a new <see cref="InteractorFacade"/> is added to the ignored collection.
-        /// </summary>
-        /// <param name="interactor">The Interactor to ignore collisions from.</param>
-        protected virtual void OnIgnoredInteractorAdded(InteractorFacade interactor)
-        {
-            Processor.IgnoreInteractorsCollisions(interactor);
-        }
-
-        /// <summary>
-        /// Processes when a new <see cref="InteractorFacade"/> is removed from the ignored collection.
-        /// </summary>
-        /// <param name="interactor">The Interactor to resume collisions with.</param>
-        protected virtual void OnIgnoredInteractorRemoved(InteractorFacade interactor)
-        {
-            Processor.ResumeInteractorsCollisions(interactor);
+#pragma warning restore 0618
         }
 
         /// <summary>
@@ -219,36 +197,6 @@
         protected virtual void OnAfterOffsetChange()
         {
             Processor.ConfigureOffsetObjectFollower();
-        }
-
-        /// <summary>
-        /// Called after <see cref="IgnoredInteractors"/> has been changed.
-        /// </summary>
-        [CalledBeforeChangeOf(nameof(IgnoredInteractors))]
-        protected virtual void OnBeforeIgnoredInteractorsChange()
-        {
-            if (IgnoredInteractors == null)
-            {
-                return;
-            }
-
-            IgnoredInteractors.Added.RemoveListener(OnIgnoredInteractorAdded);
-            IgnoredInteractors.Removed.RemoveListener(OnIgnoredInteractorRemoved);
-        }
-
-        /// <summary>
-        /// Called after <see cref="IgnoredInteractors"/> has been changed.
-        /// </summary>
-        [CalledAfterChangeOf(nameof(IgnoredInteractors))]
-        protected virtual void OnAfterIgnoredInteractorsChange()
-        {
-            if (IgnoredInteractors == null)
-            {
-                return;
-            }
-
-            IgnoredInteractors.Added.AddListener(OnIgnoredInteractorAdded);
-            IgnoredInteractors.Removed.AddListener(OnIgnoredInteractorRemoved);
         }
     }
 }
