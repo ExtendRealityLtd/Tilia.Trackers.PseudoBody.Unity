@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.5.2](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.5.1...v1.5.2) (2021-02-04)
+
+#### Miscellaneous Chores
+
+* **deps:** bump io.extendreality.tilia.mutators.collisionignorer.unity ([d074937](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/d074937b67649e7287857dd43f8b4e9193f1ec24))
+  > Bumps [io.extendreality.tilia.mutators.collisionignorer.unity](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity) from 1.1.23 to 1.1.24. - [Release notes](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity/releases) - [Changelog](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity/blob/master/CHANGELOG.md) - [Commits](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity/compare/v1.1.23...v1.1.24)
+  > 
+  > Signed-off-by: dependabot[bot] <support@github.com>
+
 ### [1.5.1](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.5.0...v1.5.1) (2021-02-04)
 
 #### Miscellaneous Chores
