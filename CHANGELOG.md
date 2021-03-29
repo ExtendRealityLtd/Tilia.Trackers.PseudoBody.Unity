@@ -1,5 +1,18 @@
 # Changelog
 
+### [1.5.12](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.5.11...v1.5.12) (2021-03-29)
+
+#### Miscellaneous Chores
+
+* **deps:** bump io.extendreality.tilia.interactions.interactables.unity ([1475291](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/1475291a7c654c568d496ba6008374be03af5066))
+  > Bumps [io.extendreality.tilia.interactions.interactables.unity](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity) from 1.15.10 to 1.15.11. - [Release notes](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/releases) - [Changelog](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/blob/master/CHANGELOG.md) - [Commits](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/compare/v1.15.10...v1.15.11)
+  > 
+  > Signed-off-by: dependabot[bot] <support@github.com>
+* **deps:** bump io.extendreality.tilia.mutators.collisionignorer.unity ([8463542](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/846354279eb34a12e4143552b73a43b72d825db0))
+  > Bumps [io.extendreality.tilia.mutators.collisionignorer.unity](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity) from 1.1.26 to 1.1.27. - [Release notes](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity/releases) - [Changelog](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity/blob/master/CHANGELOG.md) - [Commits](https://github.com/ExtendRealityLtd/Tilia.Mutators.CollisionIgnorer.Unity/compare/v1.1.26...v1.1.27)
+  > 
+  > Signed-off-by: dependabot[bot] <support@github.com>
+
 ### [1.5.11](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.5.10...v1.5.11) (2021-03-29)
 
 #### Miscellaneous Chores
