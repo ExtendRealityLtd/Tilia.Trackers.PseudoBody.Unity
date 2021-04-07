@@ -59,9 +59,7 @@ Rename the duplicated `Floor (3)` to `Block`.
 
 ### Step 3
 
-Expand the `Tilia Trackers PseudoBody Unity` package directory in the Unity Project window and select the `Packages -> Tilia Trackers PseudoBody Unity -> Runtime -> Prefabs` directory then drag and drop the `Trackers.PseudoBody` prefab into the Unity Hierarchy window.
-
-![Drag And Drop Trackers PseudoBody Into Hierarchy](assets/images/DragAndDropTrackersPseudoBodyIntoHierarchy.png)
+Add a `Trackers.PseudoBody` prefab to the Unity project hierarchy by selecting `GameObject -> Tilia -> Prefabs -> Trackers -> Trackers.PseudoBody` from the Unity main top menu.
 
 ### Step 4
 
