@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.5.15...v1.6.0) (2021-04-07)
+
+#### Features
+
+* **Utility:** add prefab creator ([382ff5b](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/382ff5b77727fe59647f68fe1bd42d5aca83591a))
+  > The latest version of Zinnia has the basis of a prefab creator that can be used to enable easy adding of prefabs to a scene without needing to drag and drop from directories. Instead a new menu item is added for quickly adding prefabs. The guide has been updated to accommodate this and the FodyWeavers.xml is now located in the root to serve both the Runtime and Editor scripts.
+
+#### Bug Fixes
+
+* **package.json:** add missing reference to Editor directory ([b1b61b0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/b1b61b04c190876eed6962c26fbe58bac849546d))
+  > The build will fail without referencing this new Editor directory so it has now been added to the package.
+
 ### [1.5.15](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.5.14...v1.5.15) (2021-04-01)
 
 #### Miscellaneous Chores
