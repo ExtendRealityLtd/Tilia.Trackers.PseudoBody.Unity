@@ -2,7 +2,7 @@
     "name": "io.extendreality.tilia.trackers.pseudobody.unity",
     "displayName": "Tilia Trackers PseudoBody Unity",
     "description": "A representation of a collidable body volume that tracks a GameObject in a spatial scene for the Unity software.",
-    "version": "1.6.7",
+    "version": "1.6.8",
     "unity": "2018.3",
     "unityRelease": "10f1",
     "keywords": [
