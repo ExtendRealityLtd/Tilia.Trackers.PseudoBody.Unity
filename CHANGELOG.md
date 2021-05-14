@@ -1,5 +1,16 @@
 # Changelog
 
+### [1.6.10](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.6.9...v1.6.10) (2021-05-14)
+
+#### Miscellaneous Chores
+
+* **deps:** bump io.extendreality.tilia.interactions.interactables.unity ([4283a82](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/4283a82718c4dddb916ddcbfc8d215b869362ae6))
+  > Bumps [io.extendreality.tilia.interactions.interactables.unity](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity) from 1.18.0 to 1.19.0. - [Release notes](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/releases) - [Changelog](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/blob/master/CHANGELOG.md) - [Commits](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/compare/v1.18.0...v1.19.0)
+  > 
+  > Signed-off-by: dependabot[bot] <support@github.com>
+* **README.md:** update title logo to related-media repo ([7f78918](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/7f7891873ea7e7613a16c95a654cb0296c06a9c1))
+  > The title logo is now located on the related-media repo.
+
 ### [1.6.9](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.6.8...v1.6.9) (2021-05-10)
 
 #### Miscellaneous Chores
