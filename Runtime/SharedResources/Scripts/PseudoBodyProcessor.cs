@@ -104,6 +104,12 @@
         [Serialized]
         [field: DocumentedByXml, Restricted]
         public CollisionIgnorer CollisionsToIgnore { get; protected set; }
+        /// <summary>
+        /// Whether the processor should update the <see cref="Facade.Source"/> position.
+        /// </summary>
+        [Serialized]
+        [field: DocumentedByXml]
+        public bool UpdateSourcePosition { get; set; } = true;
         #endregion
 
         /// <summary>
@@ -182,7 +188,10 @@
                 offsetPosition.y = PhysicsBody.position.y - Character.skinWidth;
 
                 Facade.Offset.transform.position = offsetPosition;
-                Facade.Source.transform.position += offsetPosition - previousPosition;
+                if (UpdateSourcePosition)
+                {
+                    Facade.Source.transform.position += offsetPosition - previousPosition;
+                }
             }
 
             Vector3 previousCharacterControllerPosition;
@@ -198,7 +207,10 @@
                 {
                     Vector3 movement = Character.transform.position - previousCharacterControllerPosition;
                     Facade.Offset.transform.position += movement;
-                    Facade.Source.transform.position += movement;
+                    if (UpdateSourcePosition)
+                    {
+                        Facade.Source.transform.position += movement;
+                    }
                 }
             }
 
@@ -272,7 +284,20 @@
             }
 
             float newDistance = difference.magnitude - minimumDistanceToColliders;
-            (Facade.Offset == null ? Facade.Source : Facade.Offset).transform.position -= difference.normalized * newDistance;
+
+            Vector3 newPosition = difference.normalized * newDistance;
+            if (Facade.Offset == null)
+            {
+                if (UpdateSourcePosition)
+                {
+                    Facade.Source.transform.position -= newPosition;
+                }
+            }
+            else
+            {
+                Facade.Offset.transform.position -= newPosition;
+            }
+
             Process();
         }
 

@@ -29,6 +29,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [IsDiverged]
   * [PhysicsBody]
   * [RigidbodyCollider]
+  * [UpdateSourcePosition]
 * [Methods]
   * [Awake()]
   * [CheckDivergence()]
@@ -279,6 +280,16 @@ The CapsuleCollider that acts as the physical collider representation of the bod
 
 ```
 public CapsuleCollider RigidbodyCollider { get; protected set; }
+```
+
+#### UpdateSourcePosition
+
+Whether the processor should update the Facade.Source position.
+
+##### Declaration
+
+```
+public bool UpdateSourcePosition { get; set; }
 ```
 
 ### Methods
@@ -664,6 +675,7 @@ IProcessable
 [IsDiverged]: #IsDiverged
 [PhysicsBody]: #PhysicsBody
 [RigidbodyCollider]: #RigidbodyCollider
+[UpdateSourcePosition]: #UpdateSourcePosition
 [Methods]: #Methods
 [Awake()]: #Awake
 [CheckDivergence()]: #CheckDivergence
