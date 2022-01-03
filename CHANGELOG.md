@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.6.36...v1.7.0) (2022-01-03)
+
+#### Features
+
+* **PseudoBodyProcessor:** add option to not update source position ([d2a769d](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/d2a769dfe2bbdd2778105d7bf51220e1ee0c80af))
+  > There may be occasions where the Facade.Source position does not want to be updated when the processor runs. There is not always a need for the source to update.
+
 ### [1.6.36](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.6.35...v1.6.36) (2022-01-03)
 
 #### Miscellaneous Chores
