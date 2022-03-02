@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.7.19...v1.8.0) (2022-03-02)
+
+#### Features
+
+* **package.json:** add information urls to package ([96118b1](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/96118b1633705541ea5bc368c8ae29642dca43dd))
+  > The changelog, documentation and license url has been added to the package.json as these are used within the Unity package manager.
+
 ### [1.7.19](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v1.7.18...v1.7.19) (2022-02-14)
 
 #### Miscellaneous Chores
