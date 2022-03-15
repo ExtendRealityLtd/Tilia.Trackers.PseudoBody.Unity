@@ -30,7 +30,7 @@
     },
     "dependencies": {
         "io.extendreality.zinnia.unity": "1.47.1",
-        "io.extendreality.tilia.mutators.collisionignorer.unity": "1.3.1",
+        "io.extendreality.tilia.mutators.collisionignorer.unity": "1.3.2",
         "io.extendreality.tilia.interactions.interactables.unity": "1.24.1"
     },
     "files": [
