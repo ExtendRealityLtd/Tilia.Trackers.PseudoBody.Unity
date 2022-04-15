@@ -27,6 +27,8 @@ The public interface for the PseudoBody prefab.
   * [SourceThickness]
 * [Methods]
   * [Awake()]
+  * [ClearOffset()]
+  * [ClearSource()]
   * [ListenToRigidbodyMovement()]
   * [OnAfterOffsetChange()]
   * [OnAfterSourceChange()]
@@ -134,7 +136,7 @@ The object that defines the main source of truth for movement.
 ##### Declaration
 
 ```
-public PseudoBodyProcessor.MovementInterest Interest { get; set; }
+public virtual PseudoBodyProcessor.MovementInterest Interest { get; set; }
 ```
 
 #### IsCharacterControllerGrounded
@@ -144,7 +146,7 @@ Whether the body touches ground.
 ##### Declaration
 
 ```
-public bool IsCharacterControllerGrounded { get; }
+public virtual bool IsCharacterControllerGrounded { get; }
 ```
 
 #### IsDiverged
@@ -154,7 +156,7 @@ Whether the [Source] has diverged from the [Character].
 ##### Declaration
 
 ```
-public bool IsDiverged { get; }
+public virtual bool IsDiverged { get; }
 ```
 
 #### Offset
@@ -174,7 +176,7 @@ The Rigidbody that acts as the physical representation of the body.
 ##### Declaration
 
 ```
-public Rigidbody PhysicsBody { get; }
+public virtual Rigidbody PhysicsBody { get; }
 ```
 
 #### Processor
@@ -225,6 +227,26 @@ public float SourceThickness { get; set; }
 
 ```
 protected virtual void Awake()
+```
+
+#### ClearOffset()
+
+Clears [Offset].
+
+##### Declaration
+
+```
+public virtual void ClearOffset()
+```
+
+#### ClearSource()
+
+Clears [Source].
+
+##### Declaration
+
+```
+public virtual void ClearSource()
 ```
 
 #### ListenToRigidbodyMovement()
@@ -331,6 +353,8 @@ If body collisions should be prevented this method needs to be called right befo
 [PseudoBodyProcessor]: PseudoBodyProcessor.md
 [Source]: PseudoBodyFacade.md#Source
 [Source]: PseudoBodyFacade.md#Source
+[Offset]: PseudoBodyFacade.md#Offset
+[Source]: PseudoBodyFacade.md#Source
 [PhysicsBody]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_PhysicsBody
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
@@ -363,6 +387,8 @@ If body collisions should be prevented this method needs to be called right befo
 [SourceThickness]: #SourceThickness
 [Methods]: #Methods
 [Awake()]: #Awake
+[ClearOffset()]: #ClearOffset
+[ClearSource()]: #ClearSource
 [ListenToRigidbodyMovement()]: #ListenToRigidbodyMovement
 [OnAfterOffsetChange()]: #OnAfterOffsetChange
 [OnAfterSourceChange()]: #OnAfterSourceChange

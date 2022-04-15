@@ -1,15 +1,12 @@
 ﻿namespace Tilia.Trackers.PseudoBody
 {
-    using Malimbe.MemberChangeMethod;
-    using Malimbe.MemberClearanceMethod;
-    using Malimbe.PropertySerializationAttribute;
-    using Malimbe.XmlDocumentationAttribute;
     using System;
     using Tilia.Interactions.Interactables.Interactors.Collection;
     using UnityEngine;
     using UnityEngine.Events;
     using Zinnia.Data.Attribute;
     using Zinnia.Data.Collection.List;
+    using Zinnia.Extension;
 
     /// <summary>
     /// The public interface for the PseudoBody prefab.
@@ -17,87 +14,234 @@
     public class PseudoBodyFacade : MonoBehaviour
     {
         #region Tracking Settings
+        [Header("Tracking Settings")]
+        [Tooltip("The object to follow.")]
+        [SerializeField]
+        private GameObject source;
         /// <summary>
         /// The object to follow.
         /// </summary>
-        [Serialized, Cleared]
-        [field: Header("Tracking Settings"), DocumentedByXml]
-        public GameObject Source { get; set; }
+        public GameObject Source
+        {
+            get
+            {
+                return source;
+            }
+            set
+            {
+                source = value;
+                if (this.IsMemberChangeAllowed())
+                {
+                    OnAfterSourceChange();
+                }
+            }
+        }
+        [Tooltip("An optional offset for the Source to use.")]
+        [SerializeField]
+        private GameObject offset;
         /// <summary>
         /// An optional offset for the <see cref="Source"/> to use.
         /// </summary>
-        [Serialized, Cleared]
-        [field: DocumentedByXml]
-        public GameObject Offset { get; set; }
+        public GameObject Offset
+        {
+            get
+            {
+                return offset;
+            }
+            set
+            {
+                offset = value;
+                if (this.IsMemberChangeAllowed())
+                {
+                    OnAfterOffsetChange();
+                }
+            }
+        }
         #endregion
 
         #region Collision Settings
+        [Header("Collision Settings")]
+        [Tooltip("The thickness of Source to be used when resolving body collisions.")]
+        [SerializeField]
+        private float sourceThickness = 0.25f;
         /// <summary>
         /// The thickness of <see cref="Source"/> to be used when resolving body collisions.
         /// </summary>
-        [Serialized]
-        [field: Header("Collision Settings"), DocumentedByXml]
-        public float SourceThickness { get; set; } = 0.25f;
+        public float SourceThickness
+        {
+            get
+            {
+                return sourceThickness;
+            }
+            set
+            {
+                sourceThickness = value;
+            }
+        }
+        [Tooltip("The distance the pseudo body has to be away from the Source to be considered diverged.")]
+        [SerializeField]
+        private Vector3 sourceDivergenceThreshold = new Vector3(0.01f, 2f, 0.01f);
         /// <summary>
         /// The distance the pseudo body has to be away from the <see cref="Source"/> to be considered diverged.
         /// </summary>
-        [Serialized]
-        [field: DocumentedByXml]
-        public Vector3 SourceDivergenceThreshold { get; set; } = new Vector3(0.01f, 2f, 0.01f);
+        public Vector3 SourceDivergenceThreshold
+        {
+            get
+            {
+                return sourceDivergenceThreshold;
+            }
+            set
+            {
+                sourceDivergenceThreshold = value;
+            }
+        }
         #endregion
 
         #region Interaction Settings
+        [Header("Interaction Settings")]
+        [Tooltip("A collection of Interactors to exclude from physics collision checks.")]
+        [SerializeField]
+        [Restricted]
+        [Obsolete("Use `IgnoredGameObjects` instead.")]
+        private InteractorFacadeObservableList ignoredInteractors;
         /// <summary>
         /// A collection of Interactors to exclude from physics collision checks.
         /// </summary>
-        [Serialized]
-        [field: Header("Interaction Settings"), DocumentedByXml, Restricted]
         [Obsolete("Use `IgnoredGameObjects` instead.")]
-        public InteractorFacadeObservableList IgnoredInteractors { get; set; }
+        public InteractorFacadeObservableList IgnoredInteractors
+        {
+#pragma warning disable 0618
+            get
+            {
+                return ignoredInteractors;
+            }
+            set
+            {
+                ignoredInteractors = value;
+            }
+#pragma warning restore 0618
+        }
+        [Tooltip("A GameObject collection to exclude from physics collision checks.")]
+        [SerializeField]
+        private GameObjectObservableList ignoredGameObjects;
         /// <summary>
         /// A <see cref="GameObject"/> collection to exclude from physics collision checks.
         /// </summary>
-        [Serialized]
-        [field: DocumentedByXml]
-        public GameObjectObservableList IgnoredGameObjects { get; set; }
+        public GameObjectObservableList IgnoredGameObjects
+        {
+            get
+            {
+                return ignoredGameObjects;
+            }
+            set
+            {
+                ignoredGameObjects = value;
+            }
+        }
         #endregion
 
         #region Body Events
         /// <summary>
         /// Emitted when the pseudo body starts no longer being within the threshold distance of the <see cref="Source."/>.
         /// </summary>
-        [Header("Body Events"), DocumentedByXml]
+        [Header("Body Events")]
         public UnityEvent Diverged = new UnityEvent();
         /// <summary>
         /// Emitted when the pseudo body continues no longer being within the threshold distance of the <see cref="Source."/> for each subsequent frame.
         /// </summary>
-        [DocumentedByXml]
         public UnityEvent StillDiverged = new UnityEvent();
         /// <summary>
         /// Emitted when the pseudo body is back within the threshold distance of the <see cref="Source."/> after being diverged.
         /// </summary>
-        [DocumentedByXml]
         public UnityEvent Converged = new UnityEvent();
         /// <summary>
         /// Emitted when the body starts touching ground.
         /// </summary>
-        [DocumentedByXml]
         public UnityEvent BecameGrounded = new UnityEvent();
         /// <summary>
         /// Emitted when the body stops touching ground.
         /// </summary>
-        [DocumentedByXml]
         public UnityEvent BecameAirborne = new UnityEvent();
         #endregion
 
         #region Reference Settings
+        [Header("Reference Settings")]
+        [Tooltip("The linked Internal Setup.")]
+        [SerializeField]
+        [Restricted]
+        private PseudoBodyProcessor processor;
         /// <summary>
         /// The linked Internal Setup.
         /// </summary>
-        [Serialized]
-        [field: Header("Reference Settings"), DocumentedByXml, Restricted]
-        public PseudoBodyProcessor Processor { get; protected set; }
+        public PseudoBodyProcessor Processor
+        {
+            get
+            {
+                return processor;
+            }
+            protected set
+            {
+                processor = value;
+            }
+        }
         #endregion
+
+        /// <summary>
+        /// The object that defines the main source of truth for movement.
+        /// </summary>
+        public virtual PseudoBodyProcessor.MovementInterest Interest
+        {
+            get
+            {
+                return Processor.Interest;
+            }
+            set
+            {
+                Processor.Interest = value;
+            }
+        }
+
+        /// <summary>
+        /// Whether the body touches ground.
+        /// </summary>
+        public virtual bool IsCharacterControllerGrounded => Processor.IsCharacterControllerGrounded;
+
+        /// <summary>
+        /// The <see cref="Rigidbody"/> that acts as the physical representation of the body.
+        /// </summary>
+        public virtual Rigidbody PhysicsBody => Processor.PhysicsBody;
+
+        /// <summary>
+        /// Whether the <see cref="Source"/> has diverged from the <see cref="PseudoBodyProcessor.Character"/>.
+        /// </summary>
+        public virtual bool IsDiverged => Processor.IsDiverged;
+
+        /// <summary>
+        /// Clears <see cref="Source"/>.
+        /// </summary>
+        public virtual void ClearSource()
+        {
+            if (!this.IsValidState())
+            {
+                return;
+            }
+
+            Source = default;
+        }
+
+        /// <summary>
+        /// Clears <see cref="Offset"/>.
+        /// </summary>
+        public virtual void ClearOffset()
+        {
+            if (!this.IsValidState())
+            {
+                return;
+            }
+
+            Offset = default;
+        }
+
         /// <summary>
         /// Sets the <see cref="SourceDivergenceThreshold"/> x value.
         /// </summary>
@@ -124,30 +268,6 @@
         {
             SourceDivergenceThreshold = new Vector3(SourceDivergenceThreshold.x, SourceDivergenceThreshold.y, value);
         }
-
-        /// <summary>
-        /// The object that defines the main source of truth for movement.
-        /// </summary>
-        public PseudoBodyProcessor.MovementInterest Interest
-        {
-            get { return Processor.Interest; }
-            set { Processor.Interest = value; }
-        }
-
-        /// <summary>
-        /// Whether the body touches ground.
-        /// </summary>
-        public bool IsCharacterControllerGrounded => Processor.IsCharacterControllerGrounded;
-
-        /// <summary>
-        /// The <see cref="Rigidbody"/> that acts as the physical representation of the body.
-        /// </summary>
-        public Rigidbody PhysicsBody => Processor.PhysicsBody;
-
-        /// <summary>
-        /// Whether the <see cref="Source"/> has diverged from the <see cref="PseudoBodyProcessor.Character"/>.
-        /// </summary>
-        public bool IsDiverged => Processor.IsDiverged;
 
         /// <summary>
         /// Sets the source of truth for movement to come from <see cref="PseudoBodyProcessor.PhysicsBody"/> until <see cref="PseudoBodyProcessor.Character"/> hits the ground, then <see cref="PseudoBodyProcessor.Character"/> is the new source of truth.
@@ -184,7 +304,6 @@
         /// <summary>
         /// Called after <see cref="Source"/> has been changed.
         /// </summary>
-        [CalledAfterChangeOf(nameof(Source))]
         protected virtual void OnAfterSourceChange()
         {
             Processor.ConfigureSourceObjectFollower();
@@ -193,7 +312,6 @@
         /// <summary>
         /// Called after <see cref="Offset"/> has been changed.
         /// </summary>
-        [CalledAfterChangeOf(nameof(Offset))]
         protected virtual void OnAfterOffsetChange()
         {
             Processor.ConfigureOffsetObjectFollower();

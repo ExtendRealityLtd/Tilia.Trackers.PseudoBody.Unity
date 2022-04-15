@@ -1,9 +1,5 @@
 ﻿namespace Tilia.Trackers.PseudoBody
 {
-    using Malimbe.BehaviourStateRequirementMethod;
-    using Malimbe.MemberChangeMethod;
-    using Malimbe.PropertySerializationAttribute;
-    using Malimbe.XmlDocumentationAttribute;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -71,63 +67,154 @@
         }
 
         #region Facade Settings
+        [Header("Facade Settings")]
+        [Tooltip("The public interface facade.")]
+        [SerializeField]
+        [Restricted]
+        private PseudoBodyFacade facade;
         /// <summary>
         /// The public interface facade.
         /// </summary>
-        [Serialized]
-        [field: Header("Facade Settings"), DocumentedByXml, Restricted]
-        public PseudoBodyFacade Facade { get; protected set; }
+        public PseudoBodyFacade Facade
+        {
+            get
+            {
+                return facade;
+            }
+            protected set
+            {
+                facade = value;
+            }
+        }
         #endregion
 
         #region Reference Settings
+        [Header("Reference Settings")]
+        [Tooltip("The CharacterController that acts as the main representation of the body.")]
+        [SerializeField]
+        [Restricted]
+        private CharacterController character;
         /// <summary>
-        /// The <see cref="UnityEngine.CharacterController"/> that acts as the main representation of the body.
+        /// The <see cref="CharacterController"/> that acts as the main representation of the body.
         /// </summary>
-        [Serialized]
-        [field: Header("Reference Settings"), DocumentedByXml, Restricted]
-        public CharacterController Character { get; protected set; }
+        public CharacterController Character
+        {
+            get
+            {
+                return character;
+            }
+            protected set
+            {
+                character = value;
+            }
+        }
+        [Tooltip("The Rigidbody that acts as the physical representation of the body.")]
+        [SerializeField]
+        [Restricted]
+        private Rigidbody physicsBody;
         /// <summary>
         /// The <see cref="Rigidbody"/> that acts as the physical representation of the body.
         /// </summary>
-        [Serialized]
-        [field: DocumentedByXml, Restricted]
-        public Rigidbody PhysicsBody { get; protected set; }
+        public Rigidbody PhysicsBody
+        {
+            get
+            {
+                return physicsBody;
+            }
+            protected set
+            {
+                physicsBody = value;
+            }
+        }
+        [Tooltip("The CapsuleCollider that acts as the physical collider representation of the body.")]
+        [SerializeField]
+        [Restricted]
+        private CapsuleCollider rigidbodyCollider;
         /// <summary>
         /// The <see cref="CapsuleCollider"/> that acts as the physical collider representation of the body.
         /// </summary>
-        [Serialized]
-        [field: DocumentedByXml, Restricted]
-        public CapsuleCollider RigidbodyCollider { get; protected set; }
+        public CapsuleCollider RigidbodyCollider
+        {
+            get
+            {
+                return rigidbodyCollider;
+            }
+            protected set
+            {
+                rigidbodyCollider = value;
+            }
+        }
+        [Tooltip("A CollisionIgnorer to manage ignoring collisions with the PseudoBody colliders.")]
+        [SerializeField]
+        [Restricted]
+        private CollisionIgnorer collisionsToIgnore;
         /// <summary>
         /// A <see cref="CollisionIgnorer"/> to manage ignoring collisions with the PseudoBody colliders.
         /// </summary>
-        [Serialized]
-        [field: DocumentedByXml, Restricted]
-        public CollisionIgnorer CollisionsToIgnore { get; protected set; }
+        public CollisionIgnorer CollisionsToIgnore
+        {
+            get
+            {
+                return collisionsToIgnore;
+            }
+            protected set
+            {
+                collisionsToIgnore = value;
+            }
+        }
+        [Tooltip("Whether the processor should update the Facade.Source position.")]
+        [SerializeField]
+        private bool updateSourcePosition = true;
         /// <summary>
         /// Whether the processor should update the <see cref="Facade.Source"/> position.
         /// </summary>
-        [Serialized]
-        [field: DocumentedByXml]
-        public bool UpdateSourcePosition { get; set; } = true;
+        public bool UpdateSourcePosition
+        {
+            get
+            {
+                return updateSourcePosition;
+            }
+            set
+            {
+                updateSourcePosition = value;
+            }
+        }
         #endregion
 
         /// <summary>
+        /// The private backing field for <see cref="Interest"/>.
+        /// </summary>
+        private MovementInterest interest = MovementInterest.CharacterControllerUntilAirborne;
+        /// <summary>
         /// The object that defines the main source of truth for movement.
         /// </summary>
-        public MovementInterest Interest { get; set; } = MovementInterest.CharacterControllerUntilAirborne;
+        public MovementInterest Interest
+        {
+            get
+            {
+                return interest;
+            }
+            set
+            {
+                interest = value;
+                if (this.IsMemberChangeAllowed())
+                {
+                    OnAfterInterestChange();
+                }
+            }
+        }
         /// <summary>
         /// The current divergence state of the pseudo body.
         /// </summary>
-        public DivergenceState CurrentDivergenceState => GetDivergenceState();
+        public virtual DivergenceState CurrentDivergenceState => GetDivergenceState();
         /// <summary>
         /// Whether <see cref="Character"/> touches ground.
         /// </summary>
-        public bool IsCharacterControllerGrounded => wasCharacterControllerGrounded == true;
+        public virtual bool IsCharacterControllerGrounded => wasCharacterControllerGrounded == true;
         /// <summary>
         /// Whether <see cref="Facade.Source"/> has diverged from the <see cref="Character"/>.
         /// </summary>
-        public bool IsDiverged { get; protected set; }
+        public virtual bool IsDiverged { get; protected set; }
 
         /// <summary>
         /// Movement to apply to <see cref="Character"/> to resolve collisions.
@@ -177,9 +264,13 @@
         /// <summary>
         /// Positions, sizes and controls all variables necessary to make a body representation follow the given <see cref="PseudoBodyFacade.Source"/>.
         /// </summary>
-        [RequiresBehaviourState]
         public virtual void Process()
         {
+            if (!this.IsValidState())
+            {
+                return;
+            }
+
             if (Interest != MovementInterest.CharacterController && Facade.Offset != null)
             {
                 Vector3 offsetPosition = Facade.Offset.transform.position;
@@ -254,10 +345,9 @@
         /// <remarks>
         /// If body collisions should be prevented this method needs to be called right before or right after applying any form of movement to the body.
         /// </remarks>
-        [RequiresBehaviourState]
         public virtual void SolveBodyCollisions()
         {
-            if (Facade.Source == null)
+            if (!this.IsValidState() || Facade.Source == null)
             {
                 return;
             }
@@ -637,7 +727,6 @@
         /// <summary>
         /// Called after <see cref="Interest"/> has been changed.
         /// </summary>
-        [CalledAfterChangeOf(nameof(Interest))]
         protected virtual void OnAfterInterestChange()
         {
             switch (Interest)
