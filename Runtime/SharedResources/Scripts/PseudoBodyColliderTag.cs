@@ -2,7 +2,5 @@
 {
     using UnityEngine;
 
-    public class PseudoBodyColliderTag : MonoBehaviour
-    {
-    }
+    public class PseudoBodyColliderTag : MonoBehaviour { }
 }

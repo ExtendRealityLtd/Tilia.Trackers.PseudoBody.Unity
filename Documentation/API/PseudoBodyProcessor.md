@@ -194,7 +194,7 @@ protected bool wasDiverged
 
 #### Character
 
-The UnityEngine.CharacterController that acts as the main representation of the body.
+The CharacterController that acts as the main representation of the body.
 
 ##### Declaration
 
@@ -219,7 +219,7 @@ The current divergence state of the pseudo body.
 ##### Declaration
 
 ```
-public PseudoBodyProcessor.DivergenceState CurrentDivergenceState { get; }
+public virtual PseudoBodyProcessor.DivergenceState CurrentDivergenceState { get; }
 ```
 
 #### Facade
@@ -249,7 +249,7 @@ Whether [Character] touches ground.
 ##### Declaration
 
 ```
-public bool IsCharacterControllerGrounded { get; }
+public virtual bool IsCharacterControllerGrounded { get; }
 ```
 
 #### IsDiverged
@@ -259,7 +259,7 @@ Whether Facade.Source has diverged from the [Character].
 ##### Declaration
 
 ```
-public bool IsDiverged { get; protected set; }
+public virtual bool IsDiverged { get; protected set; }
 ```
 
 #### PhysicsBody
