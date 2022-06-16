@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.0.16...v2.1.0) (2022-06-16)
+
+#### Features
+
+* **Facade:** add snap to source meethod ([a2513fa](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/a2513fac7a385a731084da227e40d7cafd21c4e9))
+  > The SnapToSource method will cause the PseudoBody tracking elements to snap to the Facade.Source without colliding with anything in its path.
+
 ### [2.0.16](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.0.15...v2.0.16) (2022-05-28)
 
 #### Miscellaneous Chores
