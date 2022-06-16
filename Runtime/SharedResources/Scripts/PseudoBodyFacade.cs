@@ -291,6 +291,14 @@
             Processor.SolveBodyCollisions();
         }
 
+        /// <summary>
+        /// Snaps the <see cref="Processor.Character"/> to the <see cref="Source"/> position.
+        /// </summary>
+        public virtual void SnapToSource()
+        {
+            Processor.SnapToSource();
+        }
+
         protected virtual void Awake()
         {
 #pragma warning disable 0618

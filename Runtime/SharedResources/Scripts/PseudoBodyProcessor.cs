@@ -260,6 +260,18 @@
         /// The routine for checking to see if the <see cref="Facade.Source"/> is still diverged with the <see cref="Character"/> at the end of the frame.
         /// </summary>
         protected Coroutine checkDivergedAtEndOfFrameRoutine;
+        /// <summary>
+        /// Whether to snap the dependents to the <see cref="Facade.Source"/> without any divergent checking.
+        /// </summary>
+        protected bool doSnapToSource;
+
+        /// <summary>
+        /// Snaps the <see cref="Character"/> to the <see cref="Facade.Source"/> position.
+        /// </summary>
+        public virtual void SnapToSource()
+        {
+            doSnapToSource = true;
+        }
 
         /// <summary>
         /// Positions, sizes and controls all variables necessary to make a body representation follow the given <see cref="PseudoBodyFacade.Source"/>.
@@ -268,6 +280,13 @@
         {
             if (!this.IsValidState())
             {
+                return;
+            }
+
+            if (doSnapToSource)
+            {
+                SnapDependentsToSource();
+                doSnapToSource = false;
                 return;
             }
 
@@ -469,9 +488,7 @@
             ConfigureSourceObjectFollower();
             ConfigureOffsetObjectFollower();
             Interest = MovementInterest.CharacterControllerUntilAirborne;
-            MatchCharacterControllerWithSource(true);
-            MatchRigidbodyAndColliderWithCharacterController();
-            RememberCurrentPositions();
+            SnapDependentsToSource();
         }
 
         protected virtual void OnDisable()
@@ -479,6 +496,16 @@
             StopCheckDivergenceAtEndOfFrameRoutine();
             sourceObjectFollower = null;
             offsetObjectFollower = null;
+        }
+
+        /// <summary>
+        /// Snaps the <see cref="CharacterController"/> and the <see cref="PhysicsBody"/> to the <see cref="Facade.Source"/>.
+        /// </summary>
+        protected virtual void SnapDependentsToSource()
+        {
+            MatchCharacterControllerWithSource(true);
+            MatchRigidbodyAndColliderWithCharacterController();
+            RememberCurrentPositions();
         }
 
         /// <summary>

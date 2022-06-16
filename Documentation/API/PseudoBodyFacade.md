@@ -35,6 +35,7 @@ The public interface for the PseudoBody prefab.
   * [SetSourceDivergenceThresholdX(Single)]
   * [SetSourceDivergenceThresholdY(Single)]
   * [SetSourceDivergenceThresholdZ(Single)]
+  * [SnapToSource()]
   * [SolveBodyCollisions()]
 
 ## Details
@@ -331,6 +332,16 @@ public virtual void SetSourceDivergenceThresholdZ(float value)
 | --- | --- | --- |
 | System.Single | value | The value to set to. |
 
+#### SnapToSource()
+
+Snaps the Processor.Character to the [Source] position.
+
+##### Declaration
+
+```
+public virtual void SnapToSource()
+```
+
 #### SolveBodyCollisions()
 
 Solves body collisions by not moving the body in case it can't go to its current position.
@@ -364,6 +375,7 @@ If body collisions should be prevented this method needs to be called right befo
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
+[Source]: PseudoBodyFacade.md#Source
 [Inheritance]: #Inheritance
 [Namespace]: #Namespace
 [Syntax]: #Syntax
@@ -395,4 +407,5 @@ If body collisions should be prevented this method needs to be called right befo
 [SetSourceDivergenceThresholdX(Single)]: #SetSourceDivergenceThresholdXSingle
 [SetSourceDivergenceThresholdY(Single)]: #SetSourceDivergenceThresholdYSingle
 [SetSourceDivergenceThresholdZ(Single)]: #SetSourceDivergenceThresholdZSingle
+[SnapToSource()]: #SnapToSource
 [SolveBodyCollisions()]: #SolveBodyCollisions

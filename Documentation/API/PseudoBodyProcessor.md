@@ -10,6 +10,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 * [Fields]
   * [checkDivergedAtEndOfFrameRoutine]
   * [collisionResolutionMovement]
+  * [doSnapToSource]
   * [ignoredColliders]
   * [ignoreInteractorCollisions]
   * [offsetObjectFollower]
@@ -53,6 +54,8 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [ResumeInteractorsCollisions(GameObject)]
   * [ResumeInteractorsCollisions(InteractorFacade)]
   * [ResumeInteractorUngrabbedCollision(InteractableFacade)]
+  * [SnapDependentsToSource()]
+  * [SnapToSource()]
   * [SolveBodyCollisions()]
   * [StopCheckDivergenceAtEndOfFrameRoutine()]
 * [Implements]
@@ -75,7 +78,7 @@ IProcessable
 ##### Syntax
 
 ```
-public class PseudoBodyProcessor : MonoBehaviour, IProcessable
+public class PseudoBodyProcessor : MonoBehaviour
 ```
 
 ### Fields
@@ -98,6 +101,16 @@ Movement to apply to [Character] to resolve collisions.
 
 ```
 protected static readonly Vector3 collisionResolutionMovement
+```
+
+#### doSnapToSource
+
+Whether to snap the dependents to the Facade.Source without any divergent checking.
+
+##### Declaration
+
+```
+protected bool doSnapToSource
 ```
 
 #### ignoredColliders
@@ -592,6 +605,26 @@ protected virtual void ResumeInteractorUngrabbedCollision(InteractableFacade int
 | --- | --- | --- |
 | InteractableFacade | interactable | The Interactable to resume. |
 
+#### SnapDependentsToSource()
+
+Snaps the CharacterController and the [PhysicsBody] to the Facade.Source.
+
+##### Declaration
+
+```
+protected virtual void SnapDependentsToSource()
+```
+
+#### SnapToSource()
+
+Snaps the [Character] to the Facade.Source position.
+
+##### Declaration
+
+```
+public virtual void SnapToSource()
+```
+
 #### SolveBodyCollisions()
 
 Solves body collisions by not moving the body in case it can't go to its current position.
@@ -650,12 +683,15 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Interest]: PseudoBodyProcessor.md#Interest
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
+[PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
+[Character]: PseudoBodyProcessor.md#Character
 [Inheritance]: #Inheritance
 [Namespace]: #Namespace
 [Syntax]: #Syntax
 [Fields]: #Fields
 [checkDivergedAtEndOfFrameRoutine]: #checkDivergedAtEndOfFrameRoutine
 [collisionResolutionMovement]: #collisionResolutionMovement
+[doSnapToSource]: #doSnapToSource
 [ignoredColliders]: #ignoredColliders
 [ignoreInteractorCollisions]: #ignoreInteractorCollisions
 [offsetObjectFollower]: #offsetObjectFollower
@@ -699,6 +735,8 @@ IProcessable
 [ResumeInteractorsCollisions(GameObject)]: #ResumeInteractorsCollisionsGameObject
 [ResumeInteractorsCollisions(InteractorFacade)]: #ResumeInteractorsCollisionsInteractorFacade
 [ResumeInteractorUngrabbedCollision(InteractableFacade)]: #ResumeInteractorUngrabbedCollisionInteractableFacade
+[SnapDependentsToSource()]: #SnapDependentsToSource
+[SnapToSource()]: #SnapToSource
 [SolveBodyCollisions()]: #SolveBodyCollisions
 [StopCheckDivergenceAtEndOfFrameRoutine()]: #StopCheckDivergenceAtEndOfFrameRoutine
 [Implements]: #Implements
