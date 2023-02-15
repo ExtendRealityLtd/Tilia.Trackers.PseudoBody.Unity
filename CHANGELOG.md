@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.1.12](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.1.11...v2.1.12) (2023-02-15)
+
+#### Miscellaneous Chores
+
+* **deps:** bump io.extendreality.tilia.interactions.interactables.unity ([727316d](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/727316d8730ceb0c05c1b4441d4b1c42768e00c9))
+  > Bumps [io.extendreality.tilia.interactions.interactables.unity](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity) from 2.8.1 to 2.8.2. - [Release notes](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/releases) - [Changelog](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/blob/master/CHANGELOG.md) - [Commits](https://github.com/ExtendRealityLtd/Tilia.Interactions.Interactables.Unity/compare/v2.8.1...v2.8.2)
+
 ### [2.1.11](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.1.10...v2.1.11) (2023-02-15)
 
 #### Miscellaneous Chores
