@@ -61,6 +61,27 @@
 
         #region Collision Settings
         [Header("Collision Settings")]
+        [Tooltip("Whether to automatically solve body collisions and push the character controller and source back to a safe space outside of the colliding geometry.")]
+        [SerializeField]
+        private bool preventEnterGeometry;
+        /// <summary>
+        /// Whether to automatically solve body collisions and push the character controller back and source to a safe space outside of the colliding geometry.
+        /// </summary>
+        public bool PreventEnterGeometry
+        {
+            get
+            {
+                return preventEnterGeometry;
+            }
+            set
+            {
+                preventEnterGeometry = value;
+                if (this.IsMemberChangeAllowed())
+                {
+                    OnAfterPreventEnterGeometryChange();
+                }
+            }
+        }
         [Tooltip("The radius of the character controller and capsule collider.")]
         [SerializeField]
         private float characterRadius = 0.3f;
@@ -359,6 +380,7 @@
                 Debug.LogWarning("`PsuedoBodyFacade.IgnoredInteractors` list has been deprecated. Use the `PsuedoBodyFacade.IgnoredGameObjects` list instead.", gameObject);
             }
 #pragma warning restore 0618
+            OnAfterPreventEnterGeometryChange();
         }
 
         /// <summary>
@@ -375,6 +397,23 @@
         protected virtual void OnAfterOffsetChange()
         {
             Processor.ConfigureOffsetObjectFollower();
+        }
+
+        /// <summary>
+        /// Called after <see cref="PreventEnterGeometry"/> has been changed.
+        /// </summary>
+        protected virtual void OnAfterPreventEnterGeometryChange()
+        {
+            if (PreventEnterGeometry)
+            {
+                Diverged.AddListener(SolveBodyCollisions);
+                StillDiverged.AddListener(SolveBodyCollisions);
+            }
+            else
+            {
+                Diverged.RemoveListener(SolveBodyCollisions);
+                StillDiverged.RemoveListener(SolveBodyCollisions);
+            }
         }
 
         /// <summary>
