@@ -81,9 +81,64 @@
             {
                 return facade;
             }
-            protected set
+            set
             {
                 facade = value;
+            }
+        }
+        #endregion
+
+        #region Movement Settings
+        [Header("Movement Settings")]
+        [Tooltip("Whether the processor should update the Facade.Source position.")]
+        [SerializeField]
+        private bool updateSourcePosition = true;
+        /// <summary>
+        /// Whether the processor should update the <see cref="Facade.Source"/> position.
+        /// </summary>
+        public bool UpdateSourcePosition
+        {
+            get
+            {
+                return updateSourcePosition;
+            }
+            set
+            {
+                updateSourcePosition = value;
+            }
+        }
+        [Tooltip("The duration to smooth damp the alias Source and Offset movement by.")]
+        [SerializeField]
+        private float aliasMovementDuration = 0f;
+        /// <summary>
+        /// The duration to smooth damp the alias Source and Offset movement by.
+        /// </summary>
+        public float AliasMovementDuration
+        {
+            get
+            {
+                return aliasMovementDuration;
+            }
+            set
+            {
+                aliasMovementDuration = value;
+            }
+        }
+        [Tooltip("The duration to smooth damp the collision resolution movement by.")]
+        [SerializeField]
+        private float collisionMovementDuration = 0f;
+        /// <summary>
+        /// The duration to smooth damp the collision resolution movement by.
+        /// </summary>
+        public float CollisionMovementDuration
+        {
+            get
+            {
+                return collisionMovementDuration;
+            }
+            set
+            {
+                collisionMovementDuration = value;
             }
         }
         #endregion
@@ -103,7 +158,7 @@
             {
                 return character;
             }
-            protected set
+            set
             {
                 character = value;
             }
@@ -121,7 +176,7 @@
             {
                 return physicsBody;
             }
-            protected set
+            set
             {
                 physicsBody = value;
             }
@@ -139,7 +194,7 @@
             {
                 return rigidbodyCollider;
             }
-            protected set
+            set
             {
                 rigidbodyCollider = value;
             }
@@ -157,26 +212,9 @@
             {
                 return collisionsToIgnore;
             }
-            protected set
-            {
-                collisionsToIgnore = value;
-            }
-        }
-        [Tooltip("Whether the processor should update the Facade.Source position.")]
-        [SerializeField]
-        private bool updateSourcePosition = true;
-        /// <summary>
-        /// Whether the processor should update the <see cref="Facade.Source"/> position.
-        /// </summary>
-        public bool UpdateSourcePosition
-        {
-            get
-            {
-                return updateSourcePosition;
-            }
             set
             {
-                updateSourcePosition = value;
+                collisionsToIgnore = value;
             }
         }
         #endregion
@@ -219,7 +257,7 @@
         /// <summary>
         /// Movement to apply to <see cref="Character"/> to resolve collisions.
         /// </summary>
-        protected static readonly Vector3 collisionResolutionMovement = new Vector3(0.001f, 0f, 0f);
+        protected static readonly Vector3 collisionResolutionMovement = Vector3.right * 0.001f;
         /// <summary>
         /// The colliders to ignore body collisions with.
         /// </summary>
@@ -229,9 +267,21 @@
         /// </summary>
         protected readonly HashSet<Collider> restoreColliders = new HashSet<Collider>();
         /// <summary>
+        /// The center of the <see cref="Character"/>.
+        /// </summary>
+        protected Vector3 CharacterCenter => Vector3.up * (Character.radius - Character.skinWidth - 0.001f);
+        /// <summary>
         /// The previous position of <see cref="PhysicsBody"/>.
         /// </summary>
         protected Vector3 previousRigidbodyPosition;
+        /// <summary>
+        /// The previous position of the <see cref="Facade.Offset"/>.
+        /// </summary>
+        protected Vector3 previousOffsetPosition;
+        /// <summary>
+        /// The previous position for the <see cref="Character"/>.
+        /// </summary>
+        protected Vector3 previousCharacterControllerPosition;
         /// <summary>
         /// Whether <see cref="Character"/> was grounded previously.
         /// </summary>
@@ -264,6 +314,10 @@
         /// Whether to snap the dependents to the <see cref="Facade.Source"/> without any divergent checking.
         /// </summary>
         protected bool doSnapToSource;
+        /// <summary>
+        /// A reference to output any smooth damp velocity to.
+        /// </summary>
+        protected Vector3 smoothDampVelocity;
 
         /// <summary>
         /// Snaps the <see cref="Character"/> to the <see cref="Facade.Source"/> position.
@@ -290,67 +344,13 @@
                 return;
             }
 
-            if (Interest != MovementInterest.CharacterController && Facade.Offset != null)
-            {
-                Vector3 offsetPosition = Facade.Offset.transform.position;
-                Vector3 previousPosition = offsetPosition;
+            UpdateAliasForNonCharacterControllerInterest();
 
-                offsetPosition.y = PhysicsBody.position.y - Character.skinWidth;
-
-                Facade.Offset.transform.position = offsetPosition;
-                if (UpdateSourcePosition)
-                {
-                    Facade.Source.transform.position += offsetPosition - previousPosition;
-                }
-            }
-
-            Vector3 previousCharacterControllerPosition;
-
-            // Handle walking down stairs/slopes and physics affecting the RigidBody in general.
-            Vector3 rigidbodyPhysicsMovement = PhysicsBody.position - previousRigidbodyPosition;
-            if (Interest == MovementInterest.Rigidbody || Interest == MovementInterest.RigidbodyUntilGrounded)
-            {
-                previousCharacterControllerPosition = Character.transform.position;
-                Character.Move(rigidbodyPhysicsMovement);
-
-                if (Facade.Offset != null)
-                {
-                    Vector3 movement = Character.transform.position - previousCharacterControllerPosition;
-                    Facade.Offset.transform.position += movement;
-                    if (UpdateSourcePosition)
-                    {
-                        Facade.Source.transform.position += movement;
-                    }
-                }
-            }
-
-            // Position the CharacterController and handle moving the source relative to the offset.
-            Vector3 characterControllerPosition = Character.transform.position;
-            previousCharacterControllerPosition = characterControllerPosition;
-            MatchCharacterControllerWithSource(false);
-            Vector3 characterControllerSourceMovement = characterControllerPosition - previousCharacterControllerPosition;
-
+            Vector3 characterControllerSourceMovement = UpdateAliasForRigidbodyControllerInterest(out Vector3 rigidbodyPhysicsMovement);
             bool isGrounded = CheckIfCharacterControllerIsGrounded();
 
-            // Allow moving the RigidBody via physics.
-            if (Interest == MovementInterest.CharacterControllerUntilAirborne && !isGrounded)
-            {
-                Interest = MovementInterest.RigidbodyUntilGrounded;
-            }
-            else if (Interest == MovementInterest.RigidbodyUntilGrounded
-                && isGrounded
-                && rigidbodyPhysicsMovement.sqrMagnitude <= 1E-06F
-                && rigidbodySetFrameCount > 0
-                && rigidbodySetFrameCount + 1 < Time.frameCount)
-            {
-                Interest = MovementInterest.CharacterControllerUntilAirborne;
-            }
-
-            // Handle walking up stairs/slopes via the CharacterController.
-            if (isGrounded && Facade.Offset != null && characterControllerSourceMovement.y > 0f)
-            {
-                Facade.Offset.transform.position += Vector3.up * characterControllerSourceMovement.y;
-            }
+            UpdateInterestType(isGrounded, rigidbodyPhysicsMovement);
+            UpdateAliasForVerticalMovement(isGrounded, characterControllerSourceMovement);
 
             MatchRigidbodyAndColliderWithCharacterController();
             CheckDivergence();
@@ -371,43 +371,48 @@
                 return;
             }
 
-            if (offsetObjectFollower != null)
-            {
-                offsetObjectFollower.Process();
-            }
-
-            if (sourceObjectFollower != null)
-            {
-                sourceObjectFollower.Process();
-            }
-
+            ProcessObjectFollowers();
             Process();
-            Vector3 characterControllerPosition = Character.transform.position + Character.center;
-            Vector3 difference = Facade.Source.transform.position - characterControllerPosition;
-            difference.y = 0f;
-
-            float minimumDistanceToColliders = Character.radius - Facade.SourceThickness;
-            if (difference.magnitude < minimumDistanceToColliders && !IsDiverged)
-            {
-                return;
-            }
-
-            float newDistance = difference.magnitude - minimumDistanceToColliders;
-
-            Vector3 newPosition = difference.normalized * newDistance;
-            if (Facade.Offset == null)
-            {
-                if (UpdateSourcePosition)
-                {
-                    Facade.Source.transform.position -= newPosition;
-                }
-            }
-            else
-            {
-                Facade.Offset.transform.position -= newPosition;
-            }
-
+            UpdateAliasForCollision();
             Process();
+        }
+
+        /// <summary>
+        /// Checks to see if the given position will cause a divergence between the <see cref="Facade.Source"/> and the <see cref="Facade.Offset"/> to the <see cref="Character"/>.
+        /// </summary>
+        /// <param name="targetPosition">The new position to check for.</param>
+        /// <returns>Whether a divergence will occur.</returns>
+        public virtual bool CheckWillDiverge(Vector3 targetPosition)
+        {
+            Vector3 difference = targetPosition - Facade.Offset.transform.position;
+            Vector3 position = GetCharacterPosition(Facade.Source.transform.position + difference, out float _);
+            Vector3 movement = position - Character.transform.position;
+            Character.Move(movement);
+
+            if (WillDiverge(Facade.Source.transform.position + difference, Facade.SourceDivergenceThreshold))
+            {
+                Facade.WillDiverge?.Invoke();
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see if the given position will cause a divergence between the <see cref="Facade.Source"/> and the <see cref="Facade.Offset"/> to the <see cref="Character"/>.
+        /// </summary>
+        /// <param name="targetPosition">The new position to check for.</param>
+        public virtual void DoCheckWillDiverge(Vector3 targetPosition)
+        {
+            CheckWillDiverge(targetPosition);
+        }
+
+        /// <summary>
+        /// Resolves any divergence between the <see cref="Character"/> position and the actual position of the <see cref="Facade.Source"/> and <see cref="Facade.Offset"/>.
+        /// </summary>
+        public virtual void ResolveDivergence()
+        {
+            UpdateAliasForDivergence();
+            ProcessObjectFollowers();
         }
 
         /// <summary>
@@ -430,6 +435,15 @@
             {
                 offsetObjectFollower = Facade.Offset.GetComponent<ObjectFollower>();
             }
+        }
+
+        /// <summary>
+        /// Configures the character controller and capsule collider radius based on the facade settings.
+        /// </summary>
+        public virtual void ConfigureCharacterRadius()
+        {
+            Character.radius = Facade.CharacterRadius;
+            RigidbodyCollider.radius = Facade.CharacterRadius;
         }
 
         /// <summary>
@@ -487,6 +501,7 @@
         {
             ConfigureSourceObjectFollower();
             ConfigureOffsetObjectFollower();
+            ConfigureCharacterRadius();
             Interest = MovementInterest.CharacterControllerUntilAirborne;
             SnapDependentsToSource();
         }
@@ -499,11 +514,166 @@
         }
 
         /// <summary>
+        /// Updates the alias targets for when the <see cref="MovementInterest"/> is not of type CharacterController.
+        /// </summary>
+        protected virtual void UpdateAliasForNonCharacterControllerInterest()
+        {
+            if (Interest != MovementInterest.CharacterController && Facade.Offset != null)
+            {
+                Vector3 offsetPosition = Facade.Offset.transform.position;
+                offsetPosition.y = PhysicsBody.position.y - Character.skinWidth;
+
+                UpdateAliasPosition(offsetPosition, offsetPosition - previousOffsetPosition, false, true, false, AliasMovementDuration);
+                previousOffsetPosition = offsetPosition;
+            }
+        }
+
+        /// <summary>
+        /// Updates the alias targets for when the <see cref="MovementInterest"/> is of a Rigidbody type.
+        /// </summary>
+        /// <param name="rigidbodyPhysicsMovement">The calculated <see cref="Rigidbody"/> movement position.</param>
+        /// <returns>The current <see cref="Character"/> movement position.</returns>
+        protected virtual Vector3 UpdateAliasForRigidbodyControllerInterest(out Vector3 rigidbodyPhysicsMovement)
+        {
+            // Handle walking down stairs/slopes and physics affecting the RigidBody in general.
+            rigidbodyPhysicsMovement = PhysicsBody.position - previousRigidbodyPosition;
+            if (Interest == MovementInterest.Rigidbody || Interest == MovementInterest.RigidbodyUntilGrounded)
+            {
+                previousCharacterControllerPosition = Character.transform.position;
+                Character.Move(rigidbodyPhysicsMovement);
+                if (Facade.Offset != null)
+                {
+                    Vector3 movement = Character.transform.position - previousCharacterControllerPosition;
+                    UpdateAliasPosition(movement, movement, true, true, false, AliasMovementDuration);
+                }
+            }
+
+            // Position the CharacterController and handle moving the source relative to the offset.
+            Vector3 characterControllerPosition = Character.transform.position;
+            previousCharacterControllerPosition = characterControllerPosition;
+            MatchCharacterControllerWithSource(Facade.Source.transform.position, false);
+            return characterControllerPosition - previousCharacterControllerPosition;
+        }
+
+        /// <summary>
+        /// Updates the <see cref="MovementInterest"/> type based on whether the controller is grounded or not.
+        /// </summary>
+        /// <param name="isGrounded">Whether the controller is touching the ground.</param>
+        /// <param name="rigidbodyPhysicsMovement">The calculated <see cref="Rigidbody"/> movement position.</param>
+        protected virtual void UpdateInterestType(bool isGrounded, Vector3 rigidbodyPhysicsMovement)
+        {
+            // Allow moving the RigidBody via physics.
+            if (Interest == MovementInterest.CharacterControllerUntilAirborne && !isGrounded)
+            {
+                Interest = MovementInterest.RigidbodyUntilGrounded;
+            }
+            else if (Interest == MovementInterest.RigidbodyUntilGrounded
+                && isGrounded
+                && rigidbodyPhysicsMovement.sqrMagnitude <= 1E-06F
+                && rigidbodySetFrameCount > 0
+                && rigidbodySetFrameCount + 1 < Time.frameCount)
+            {
+                Interest = MovementInterest.CharacterControllerUntilAirborne;
+            }
+        }
+
+        /// <summary>
+        /// Updates the alias targets for any vertical movement.
+        /// </summary>
+        /// <param name="isGrounded">Whether the controller is touching the ground.</param>
+        /// <param name="characterControllerSourceMovement">The calculated <see cref="Character"/> movement position.</param>
+        protected virtual void UpdateAliasForVerticalMovement(bool isGrounded, Vector3 characterControllerSourceMovement)
+        {
+            // Handle walking up stairs/slopes via the CharacterController.
+            if (isGrounded && Facade.Offset != null && characterControllerSourceMovement.y > 0f)
+            {
+                UpdateAliasPosition(Vector3.up * characterControllerSourceMovement.y, default, true, true, true, AliasMovementDuration);
+            }
+        }
+
+        /// <summary>
+        /// Updates the position of the alias objects.
+        /// </summary>
+        /// <param name="newOffsetPosition">The new position for the <see cref="Facade.Offset"/>.</param>
+        /// <param name="newSourcePosition">The new position for the <see cref="Facade.Source"/>.</param>
+        /// <param name="incrementOffset">Whether to increment the <see cref="Facade.Offset"/> position or set it to a new value.</param>
+        /// <param name="incrementSource">Whether to increment the <see cref="Facade.Source"/> position or set it to a new value.</param>
+        /// <param name="ignoreSourcePosition">Whether to ignore setting the <see cref="Facade.Source"/> position.</param>
+        /// <param name="dampDuration">The duration to dampen the movemnt of the position updates.</param>
+        protected virtual void UpdateAliasPosition(Vector3 newOffsetPosition, Vector3 newSourcePosition, bool incrementOffset, bool incrementSource, bool ignoreSourcePosition, float dampDuration)
+        {
+            if (Facade.Offset != null)
+            {
+                Vector3 targetOffsetPosition = (incrementOffset ? Facade.Offset.transform.position : Vector3.zero) + newOffsetPosition;
+                Facade.Offset.transform.position = dampDuration > 0f ?
+                    Vector3.SmoothDamp(Facade.Offset.transform.position, targetOffsetPosition, ref smoothDampVelocity, dampDuration) :
+                    targetOffsetPosition;
+            }
+
+            if (Facade.Source != null && UpdateSourcePosition && !ignoreSourcePosition)
+            {
+                Vector3 targetSourcePosition = (incrementSource ? Facade.Source.transform.position : Vector3.zero) + newSourcePosition;
+                Facade.Source.transform.position = dampDuration > 0f ?
+                    Vector3.SmoothDamp(Facade.Source.transform.position, targetSourcePosition, ref smoothDampVelocity, dampDuration) :
+                    targetSourcePosition;
+            }
+        }
+
+        /// <summary>
+        /// Updates the alias targets to resolve any collisions.
+        /// </summary>
+        protected virtual void UpdateAliasForCollision()
+        {
+            Vector3 characterControllerPosition = Character.transform.position + Character.center;
+            Vector3 difference = Facade.Source.transform.position - characterControllerPosition;
+            difference.y = 0f;
+            float minimumDistanceToColliders = Character.radius - Facade.SourceThickness;
+
+            if (difference.magnitude < minimumDistanceToColliders && !IsDiverged)
+            {
+                return;
+            }
+
+            float newDistance = difference.magnitude - minimumDistanceToColliders;
+            Vector3 newPosition = difference.normalized * newDistance * -1f;
+            UpdateAliasPosition(newPosition, newPosition, true, true, false, CollisionMovementDuration);
+        }
+
+        /// <summary>
+        /// Updates the alias targets to resolve any divergence.
+        /// </summary>
+        protected virtual void UpdateAliasForDivergence()
+        {
+            Vector3 characterControllerPosition = Character.transform.position;
+            Vector3 difference = Facade.Source.transform.position - characterControllerPosition;
+            difference.y = 0f;
+            Vector3 newOffsetPosition = Facade.Offset.transform.position - difference - (Vector3.one * -Character.skinWidth);
+            newOffsetPosition.y = Facade.Offset.transform.position.y;
+            UpdateAliasPosition(-difference, -difference, true, true, false, CollisionMovementDuration);
+        }
+
+        /// <summary>
+        /// Processes the object followers for the <see cref="Facade.Source"/> and <see cref="Facade.Offset"/>.
+        /// </summary>
+        protected virtual void ProcessObjectFollowers()
+        {
+            if (offsetObjectFollower != null)
+            {
+                offsetObjectFollower.Process();
+            }
+
+            if (sourceObjectFollower != null)
+            {
+                sourceObjectFollower.Process();
+            }
+        }
+
+        /// <summary>
         /// Snaps the <see cref="CharacterController"/> and the <see cref="PhysicsBody"/> to the <see cref="Facade.Source"/>.
         /// </summary>
         protected virtual void SnapDependentsToSource()
         {
-            MatchCharacterControllerWithSource(true);
+            MatchCharacterControllerWithSource(Facade.Source.transform.position, true);
             MatchRigidbodyAndColliderWithCharacterController();
             RememberCurrentPositions();
         }
@@ -550,15 +720,14 @@
         }
 
         /// <summary>
-        /// Changes the height and position of <see cref="Character"/> to match <see cref="PseudoBodyFacade.Source"/>.
+        /// Gets the position of the <see cref="Character"/>.
         /// </summary>
-        /// <param name="setPositionDirectly">Whether to set the position directly or tell <see cref="Character"/> to move to it.</param>
-        protected virtual void MatchCharacterControllerWithSource(bool setPositionDirectly)
+        /// <param name="sourcePosition">The given position of the source.</param>
+        /// <param name="height">The calculated height of the Character.</param>
+        /// <returns>The world position of the Character.</returns>
+        protected virtual Vector3 GetCharacterPosition(Vector3 sourcePosition, out float height)
         {
-            Vector3 sourcePosition = Facade.Source.transform.position;
-            float height = Facade.Offset == null
-                ? sourcePosition.y
-                : Facade.Offset.transform.InverseTransformPoint(sourcePosition).y * Facade.Offset.transform.lossyScale.y;
+            height = Facade.Offset == null ? sourcePosition.y : Facade.Offset.transform.InverseTransformPoint(sourcePosition).y * Facade.Offset.transform.lossyScale.y;
             height -= Character.skinWidth;
 
             // CharacterController enforces a minimum height of twice its radius, so let's match that here.
@@ -572,6 +741,18 @@
                 // The offset defines the source's "floor".
                 position.y = Mathf.Max(position.y, Facade.Offset.transform.position.y + Character.skinWidth);
             }
+
+            return position;
+        }
+
+        /// <summary>
+        /// Changes the height and position of <see cref="Character"/> to match <see cref="PseudoBodyFacade.Source"/>.
+        /// </summary>
+        /// <param name="targetPosition">The position to update to.</param>
+        /// <param name="setPositionDirectly">Whether to set the position directly or tell <see cref="Character"/> to move to it.</param>
+        protected virtual void MatchCharacterControllerWithSource(Vector3 targetPosition, bool setPositionDirectly)
+        {
+            Vector3 position = GetCharacterPosition(targetPosition, out float height);
 
             if (setPositionDirectly)
             {
@@ -600,7 +781,6 @@
         /// </summary>
         protected virtual void MatchRigidbodyAndColliderWithCharacterController()
         {
-            RigidbodyCollider.radius = Character.radius;
             RigidbodyCollider.height = Character.height + Character.skinWidth;
 
             Vector3 center = Character.center;
@@ -619,24 +799,25 @@
         /// <returns>Whether <see cref="Character"/> is grounded.</returns>
         protected virtual bool CheckIfCharacterControllerIsGrounded()
         {
-            if (Character.isGrounded)
-            {
-                return true;
-            }
+            return Character.isGrounded ? true : CheckForSurroundingCollisions(Character.transform.position + CharacterCenter, Character.radius);
+        }
 
-            HeapAllocationFreeReadOnlyList<Collider> hitColliders = PhysicsCast.OverlapSphereAll(
-                null,
-                Character.transform.position + (Vector3.up * (Character.radius - Character.skinWidth - 0.001f)),
-                Character.radius,
-                1 << Character.gameObject.layer);
+        /// <summary>
+        /// Checks for any collisions in the surrounding area.
+        /// </summary>
+        /// <param name="center">The center point to start the spherecast check from.</param>
+        /// <param name="radius">The radius to perform the spherecast check to.</param>
+        /// <returns>Whether any collisions have occcured.</returns>
+        protected virtual bool CheckForSurroundingCollisions(Vector3 center, float radius)
+        {
+            HeapAllocationFreeReadOnlyList<Collider> hitColliders = PhysicsCast.OverlapSphereAll(null, center, radius, 0);
+
             foreach (Collider hitCollider in hitColliders)
             {
                 if (hitCollider != Character
                     && hitCollider != RigidbodyCollider
                     && !ignoredColliders.Contains(hitCollider)
-                    && !Physics.GetIgnoreLayerCollision(
-                        hitCollider.gameObject.layer,
-                        Character.gameObject.layer)
+                    && !Physics.GetIgnoreLayerCollision(hitCollider.gameObject.layer, Character.gameObject.layer)
                     && !Physics.GetIgnoreLayerCollision(hitCollider.gameObject.layer, PhysicsBody.gameObject.layer))
                 {
                     return true;
@@ -702,12 +883,23 @@
         }
 
         /// <summary>
+        /// Determines whether the given position will diverge from the <see cref="Character"/> position.
+        /// </summary>
+        /// <param name="targetPosition">The position to check.</param>
+        /// <param name="divergenceThreshold">The threshold in which to consider a divergence has occurred.</param>
+        /// <returns>Whether there was a divergence between the two positions.</returns>
+        protected virtual bool WillDiverge(Vector3 targetPosition, Vector3 divergenceThreshold)
+        {
+            return !targetPosition.WithinDistance(Character.transform.position + Character.center, divergenceThreshold);
+        }
+
+        /// <summary>
         /// Check to see if the <see cref="Facade.Source"/> has diverged or converged with the <see cref="Character"/>.
         /// </summary>
         protected virtual void CheckDivergence()
         {
             wasDiverged = IsDiverged;
-            IsDiverged = !Facade.Source.transform.position.WithinDistance(Character.transform.position + Character.center, Facade.SourceDivergenceThreshold);
+            IsDiverged = WillDiverge(Facade.Source.transform.position, Facade.SourceDivergenceThreshold);
 
             switch (GetDivergenceState())
             {
@@ -731,7 +923,7 @@
         /// <returns>An Enumerator to manage the running of the Coroutine.</returns>
         protected virtual IEnumerator CheckDivergenceAtEndOfFrame()
         {
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForFixedUpdate();
             if (IsDiverged)
             {
                 Facade.StillDiverged?.Invoke();
@@ -748,6 +940,7 @@
             if (checkDivergedAtEndOfFrameRoutine != null)
             {
                 StopCoroutine(checkDivergedAtEndOfFrameRoutine);
+                checkDivergedAtEndOfFrameRoutine = null;
             }
         }
 
