@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.2.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.1.60...v2.2.0) (2023-07-06)
+
+#### Features
+
+* **Facade:** add option to auto solve body collisions ([ee1dae0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/ee1dae01214fed684f7b0bb55b23ebf3ed2b3bbd))
+  > A new property has been added called Prevent Enter Geometry, which will automatically subscribe the diverged events up to the SolveBodyCollisions method to prevent the divergence of the character from the source.
+* **Facade:** add option to stop external position mutators diverging ([9088c21](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/9088c2112ef96902fd524f2b4a2761c7b57b822d))
+  > The Facade now has a new External Position Mutators list that lets a collection of GameObjects be added to the PseudoBody that will have a nested TransformPositionMutator component within them.
+  > 
+  > These TransformPositionMutator components are then linked to the relevant events to ensure any mutation of the Source/Offset will be checked to see if it causes a divergence from the PsuedoBody Character Controller and if it does then the mutation is not allowed to occur and the divergence is resolved to ensure the Character does not clip into any geometry.
+  > 
+  > This does not prevent the Source from moving inside geometry, but if the Source is inside geometry and then a TransformPositionMutator is called to mutate the position, then the divergence will be resolved automatically to move the position back to the Character.
+* **Processor:** add event when a divergence will occur ([641fb8f](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/641fb8f01f14c1c16ffed3d6be124189cac64c1e))
+  > The new WillDiverge event will emit when the new `CheckWillDiverge` method is called passing in a potential target position to move the pseudo body to. If the given position will cause a divergence then the WillDiverge event is emitted.
+  > 
+  > This can be used to determine if an external movement of the Facade.Source or Facade.Offset may cause a divergence and therefore can be prevented to stop any collision clipping from occurring.
+  > 
+  > The Character radius is now also exposed on the Facade and is set to a default of `0.3` along with the Source Thickness being defaulted to `0.3` and the Divergence Threshold being reduced to `0.001`.
+  > 
+  > The PseudoBodyProcessor has also been updated to have the option to smooth damp any movement of the Facade.Source or Facade.Offset for any custom effects that may be required. By default, these damp durations are both set to 0.
+  > 
+  > A large chunk of refactoring has been done too, so the methods are broken up into more manageable and overridable chunks.
+
 ### [2.1.60](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.1.59...v2.1.60) (2023-07-05)
 
 #### Miscellaneous Chores
