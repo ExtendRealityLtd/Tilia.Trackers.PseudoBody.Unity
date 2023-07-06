@@ -57,6 +57,23 @@
                 }
             }
         }
+        [Tooltip("A GameObject collection of any external controller that contains a Position Mutator that may change the location of the Character.\n\nThis external Position Mutator will be prevented from causing a divergence of the Character and the Source/Offset.")]
+        [SerializeField]
+        private GameObjectObservableList externalPositionMutators;
+        /// <summary>
+        /// A <see cref="GameObject"/> collection of any external controller that contains a Position Mutator that may change the location of the Character. This external Position Mutator will be prevented from causing a divergence of the Character and the Source/Offset.
+        /// </summary>
+        public GameObjectObservableList ExternalPositionMutators
+        {
+            get
+            {
+                return externalPositionMutators;
+            }
+            set
+            {
+                externalPositionMutators = value;
+            }
+        }
         #endregion
 
         #region Collision Settings

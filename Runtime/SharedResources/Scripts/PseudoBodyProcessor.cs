@@ -7,8 +7,10 @@
     using Tilia.Interactions.Interactables.Interactables;
     using Tilia.Interactions.Interactables.Interactors;
     using UnityEngine;
+    using UnityEngine.Events;
     using Zinnia.Cast;
     using Zinnia.Data.Attribute;
+    using Zinnia.Data.Operation.Mutation;
     using Zinnia.Data.Type;
     using Zinnia.Extension;
     using Zinnia.Process;
@@ -318,6 +320,14 @@
         /// A reference to output any smooth damp velocity to.
         /// </summary>
         protected Vector3 smoothDampVelocity;
+        /// <summary>
+        /// A collection of actions to perform on each <see cref="TransformPositionMutator"/> to prevent mutations from occurring.
+        /// </summary>
+        protected Dictionary<TransformPositionMutator, UnityAction> preventMutateActions = new Dictionary<TransformPositionMutator, UnityAction>();
+        /// <summary>
+        /// A collection of actions to perform on each <see cref="TransformPositionMutator"/> to allow mutations to occur.
+        /// </summary>
+        protected Dictionary<TransformPositionMutator, UnityAction<Vector3>> allowMutateActions = new Dictionary<TransformPositionMutator, UnityAction<Vector3>>();
 
         /// <summary>
         /// Snaps the <see cref="Character"/> to the <see cref="Facade.Source"/> position.
@@ -416,6 +426,15 @@
         }
 
         /// <summary>
+        /// Resolves any divergence between the <see cref="Character"/> position and the actual position of the <see cref="Facade.Source"/> and <see cref="Facade.Offset"/>.
+        /// </summary>
+        /// <param name="divergedPosition">The diverged position.</param>
+        public virtual void ResolveDivergence(Vector3 divergedPosition)
+        {
+            ResolveDivergence();
+        }
+
+        /// <summary>
         /// Configures the source object follower based on the facade settings.
         /// </summary>
         public virtual void ConfigureSourceObjectFollower()
@@ -475,6 +494,46 @@
         }
 
         /// <summary>
+        /// Adds a found <see cref="TransformPositionMutator"/> found in the given <see cref="GameObject"/>.
+        /// </summary>
+        /// <param name="mutatorContainer">The container to look for the Position Mutator in.</param>
+        public virtual void AddPositionMutator(GameObject mutatorContainer)
+        {
+            if (!TryGetMutator(mutatorContainer, out TransformPositionMutator mutator))
+            {
+                return;
+            }
+
+            preventMutateActions[mutator] = () => mutator.AllowMutate = false;
+            allowMutateActions[mutator] = (_) => mutator.AllowMutate = true;
+
+            mutator.PreMutated.AddListener(DoCheckWillDiverge);
+            mutator.MutationSkipped.AddListener(ResolveDivergence);
+            mutator.MutationSkipped.AddListener(allowMutateActions[mutator]);
+            Facade.WillDiverge.AddListener(preventMutateActions[mutator]);
+        }
+
+        /// <summary>
+        /// Removes a found <see cref="TransformPositionMutator"/> found in the given <see cref="GameObject"/>.
+        /// </summary>
+        /// <param name="mutatorContainer">The container to look for the Position Mutator in.</param>
+        public virtual void RemovePositionMutator(GameObject mutatorContainer)
+        {
+            if (!TryGetMutator(mutatorContainer, out TransformPositionMutator mutator))
+            {
+                return;
+            }
+
+            mutator.PreMutated.RemoveListener(DoCheckWillDiverge);
+            mutator.MutationSkipped.RemoveListener(ResolveDivergence);
+            mutator.MutationSkipped.RemoveListener(allowMutateActions[mutator]);
+            Facade.WillDiverge.RemoveListener(preventMutateActions[mutator]);
+
+            preventMutateActions.Remove(mutator);
+            allowMutateActions.Remove(mutator);
+        }
+
+        /// <summary>
         /// Ignores all of the colliders on the Interactor collection.
         /// </summary>
         [Obsolete("Add `InteractorFacade.gameObject` to `PseudoBodyProcessor.CollisionsToIgnore.Targets` instead.")]
@@ -511,6 +570,24 @@
             StopCheckDivergenceAtEndOfFrameRoutine();
             sourceObjectFollower = null;
             offsetObjectFollower = null;
+        }
+
+        /// <summary>
+        /// Attempts to get the <see cref="TransformPositionMutator"/> component nested within the given <see cref="GameObject"/>.
+        /// </summary>
+        /// <param name="mutatorContainer">The container to look for the component in.</param>
+        /// <param name="mutator">The found mutator.</param>
+        /// <returns>Whether a mutator has been found.</returns>
+        protected virtual bool TryGetMutator(GameObject mutatorContainer, out TransformPositionMutator mutator)
+        {
+            mutator = null;
+            if (mutatorContainer == null)
+            {
+                return false;
+            }
+
+            mutator = mutatorContainer.TryGetComponent<TransformPositionMutator>(true);
+            return mutator != null;
         }
 
         /// <summary>
