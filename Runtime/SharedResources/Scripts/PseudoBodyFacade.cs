@@ -57,13 +57,72 @@
                 }
             }
         }
+        [Tooltip("A GameObject collection of any external controller that contains a Position Mutator that may change the location of the Character.\n\nThis external Position Mutator will be prevented from causing a divergence of the Character and the Source/Offset.")]
+        [SerializeField]
+        private GameObjectObservableList externalPositionMutators;
+        /// <summary>
+        /// A <see cref="GameObject"/> collection of any external controller that contains a Position Mutator that may change the location of the Character. This external Position Mutator will be prevented from causing a divergence of the Character and the Source/Offset.
+        /// </summary>
+        public GameObjectObservableList ExternalPositionMutators
+        {
+            get
+            {
+                return externalPositionMutators;
+            }
+            set
+            {
+                externalPositionMutators = value;
+            }
+        }
         #endregion
 
         #region Collision Settings
         [Header("Collision Settings")]
+        [Tooltip("Whether to automatically solve body collisions and push the character controller and source back to a safe space outside of the colliding geometry.")]
+        [SerializeField]
+        private bool preventEnterGeometry;
+        /// <summary>
+        /// Whether to automatically solve body collisions and push the character controller back and source to a safe space outside of the colliding geometry.
+        /// </summary>
+        public bool PreventEnterGeometry
+        {
+            get
+            {
+                return preventEnterGeometry;
+            }
+            set
+            {
+                preventEnterGeometry = value;
+                if (this.IsMemberChangeAllowed())
+                {
+                    OnAfterPreventEnterGeometryChange();
+                }
+            }
+        }
+        [Tooltip("The radius of the character controller and capsule collider.")]
+        [SerializeField]
+        private float characterRadius = 0.3f;
+        /// <summary>
+        /// The radius of the character controller and capsule collider.
+        /// </summary>
+        public float CharacterRadius
+        {
+            get
+            {
+                return characterRadius;
+            }
+            set
+            {
+                characterRadius = value;
+                if (this.IsMemberChangeAllowed())
+                {
+                    OnAfterCharacterRadiusChange();
+                }
+            }
+        }
         [Tooltip("The thickness of Source to be used when resolving body collisions.")]
         [SerializeField]
-        private float sourceThickness = 0.25f;
+        private float sourceThickness = 0.3f;
         /// <summary>
         /// The thickness of <see cref="Source"/> to be used when resolving body collisions.
         /// </summary>
@@ -80,7 +139,7 @@
         }
         [Tooltip("The distance the pseudo body has to be away from the Source to be considered diverged.")]
         [SerializeField]
-        private Vector3 sourceDivergenceThreshold = new Vector3(0.01f, 2f, 0.01f);
+        private Vector3 sourceDivergenceThreshold = new Vector3(0.001f, 2f, 0.001f);
         /// <summary>
         /// The distance the pseudo body has to be away from the <see cref="Source"/> to be considered diverged.
         /// </summary>
@@ -99,28 +158,6 @@
 
         #region Interaction Settings
         [Header("Interaction Settings")]
-        [Tooltip("A collection of Interactors to exclude from physics collision checks.")]
-        [SerializeField]
-        [Restricted]
-        [Obsolete("Use `IgnoredGameObjects` instead.")]
-        private InteractorFacadeObservableList ignoredInteractors;
-        /// <summary>
-        /// A collection of Interactors to exclude from physics collision checks.
-        /// </summary>
-        [Obsolete("Use `IgnoredGameObjects` instead.")]
-        public InteractorFacadeObservableList IgnoredInteractors
-        {
-#pragma warning disable 0618
-            get
-            {
-                return ignoredInteractors;
-            }
-            set
-            {
-                ignoredInteractors = value;
-            }
-#pragma warning restore 0618
-        }
         [Tooltip("A GameObject collection to exclude from physics collision checks.")]
         [SerializeField]
         private GameObjectObservableList ignoredGameObjects;
@@ -155,6 +192,10 @@
         /// </summary>
         public UnityEvent Converged = new UnityEvent();
         /// <summary>
+        /// Emitted when the pseudo body will become no longer within the threshold distance of the <see cref="Source."/> if the updated position is applied.
+        /// </summary>
+        public UnityEvent WillDiverge = new UnityEvent();
+        /// <summary>
         /// Emitted when the body starts touching ground.
         /// </summary>
         public UnityEvent BecameGrounded = new UnityEvent();
@@ -179,10 +220,32 @@
             {
                 return processor;
             }
-            protected set
+            set
             {
                 processor = value;
             }
+        }
+        [Tooltip("A collection of Interactors to exclude from physics collision checks.")]
+        [SerializeField]
+        [Restricted]
+        [Obsolete("Use `IgnoredGameObjects` instead.")]
+        private InteractorFacadeObservableList ignoredInteractors;
+        /// <summary>
+        /// A collection of Interactors to exclude from physics collision checks.
+        /// </summary>
+        [Obsolete("Use `IgnoredGameObjects` instead.")]
+        public InteractorFacadeObservableList IgnoredInteractors
+        {
+#pragma warning disable 0618
+            get
+            {
+                return ignoredInteractors;
+            }
+            set
+            {
+                ignoredInteractors = value;
+            }
+#pragma warning restore 0618
         }
         #endregion
 
@@ -299,6 +362,33 @@
             Processor.SnapToSource();
         }
 
+        /// <summary>
+        /// Checks to see if the given position will cause a divergence between the <see cref="Facade.Source"/> and the <see cref="Facade.Offset"/> to the <see cref="Character"/>.
+        /// </summary>
+        /// <param name="targetPosition">The new position to check for.</param>
+        /// <returns>Whether a divergence will occur.</returns>
+        public virtual bool CheckWillDiverge(Vector3 targetPosition)
+        {
+            return Processor.CheckWillDiverge(targetPosition);
+        }
+
+        /// <summary>
+        /// Checks to see if the given position will cause a divergence between the <see cref="Facade.Source"/> and the <see cref="Facade.Offset"/> to the <see cref="Character"/>.
+        /// </summary>
+        /// <param name="targetPosition">The new position to check for.</param>
+        public virtual void DoCheckWillDiverge(Vector3 targetPosition)
+        {
+            CheckWillDiverge(targetPosition);
+        }
+
+        /// <summary>
+        /// Resolves any divergence between the <see cref="Character"/> position and the actual position of the <see cref="Facade.Source"/> and <see cref="Facade.Offset"/>.
+        /// </summary>
+        public virtual void ResolveDivergence()
+        {
+            Processor.ResolveDivergence();
+        }
+
         protected virtual void Awake()
         {
 #pragma warning disable 0618
@@ -307,6 +397,7 @@
                 Debug.LogWarning("`PsuedoBodyFacade.IgnoredInteractors` list has been deprecated. Use the `PsuedoBodyFacade.IgnoredGameObjects` list instead.", gameObject);
             }
 #pragma warning restore 0618
+            OnAfterPreventEnterGeometryChange();
         }
 
         /// <summary>
@@ -321,6 +412,31 @@
         /// Called after <see cref="Offset"/> has been changed.
         /// </summary>
         protected virtual void OnAfterOffsetChange()
+        {
+            Processor.ConfigureOffsetObjectFollower();
+        }
+
+        /// <summary>
+        /// Called after <see cref="PreventEnterGeometry"/> has been changed.
+        /// </summary>
+        protected virtual void OnAfterPreventEnterGeometryChange()
+        {
+            if (PreventEnterGeometry)
+            {
+                Diverged.AddListener(SolveBodyCollisions);
+                StillDiverged.AddListener(SolveBodyCollisions);
+            }
+            else
+            {
+                Diverged.RemoveListener(SolveBodyCollisions);
+                StillDiverged.RemoveListener(SolveBodyCollisions);
+            }
+        }
+
+        /// <summary>
+        /// Called after <see cref="CharacterRadius"/> has been changed.
+        /// </summary>
+        protected virtual void OnAfterCharacterRadiusChange()
         {
             Processor.ConfigureOffsetObjectFollower();
         }

@@ -13,7 +13,10 @@ The public interface for the PseudoBody prefab.
   * [Converged]
   * [Diverged]
   * [StillDiverged]
+  * [WillDiverge]
 * [Properties]
+  * [CharacterRadius]
+  * [ExternalPositionMutators]
   * [IgnoredGameObjects]
   * [IgnoredInteractors]
   * [Interest]
@@ -21,17 +24,23 @@ The public interface for the PseudoBody prefab.
   * [IsDiverged]
   * [Offset]
   * [PhysicsBody]
+  * [PreventEnterGeometry]
   * [Processor]
   * [Source]
   * [SourceDivergenceThreshold]
   * [SourceThickness]
 * [Methods]
   * [Awake()]
+  * [CheckWillDiverge(Vector3)]
   * [ClearOffset()]
   * [ClearSource()]
+  * [DoCheckWillDiverge(Vector3)]
   * [ListenToRigidbodyMovement()]
+  * [OnAfterCharacterRadiusChange()]
   * [OnAfterOffsetChange()]
+  * [OnAfterPreventEnterGeometryChange()]
   * [OnAfterSourceChange()]
+  * [ResolveDivergence()]
   * [SetSourceDivergenceThresholdX(Single)]
   * [SetSourceDivergenceThresholdY(Single)]
   * [SetSourceDivergenceThresholdZ(Single)]
@@ -107,7 +116,37 @@ Emitted when the pseudo body continues no longer being within the threshold dist
 public UnityEvent StillDiverged
 ```
 
+#### WillDiverge
+
+Emitted when the pseudo body will become no longer within the threshold distance of the Source. if the updated position is applied.
+
+##### Declaration
+
+```
+public UnityEvent WillDiverge
+```
+
 ### Properties
+
+#### CharacterRadius
+
+The radius of the character controller and capsule collider.
+
+##### Declaration
+
+```
+public float CharacterRadius { get; set; }
+```
+
+#### ExternalPositionMutators
+
+A GameObject collection of any external controller that contains a Position Mutator that may change the location of the Character. This external Position Mutator will be prevented from causing a divergence of the Character and the Source/Offset.
+
+##### Declaration
+
+```
+public GameObjectObservableList ExternalPositionMutators { get; set; }
+```
 
 #### IgnoredGameObjects
 
@@ -180,6 +219,16 @@ The Rigidbody that acts as the physical representation of the body.
 public virtual Rigidbody PhysicsBody { get; }
 ```
 
+#### PreventEnterGeometry
+
+Whether to automatically solve body collisions and push the character controller back and source to a safe space outside of the colliding geometry.
+
+##### Declaration
+
+```
+public bool PreventEnterGeometry { get; set; }
+```
+
 #### Processor
 
 The linked Internal Setup.
@@ -187,7 +236,7 @@ The linked Internal Setup.
 ##### Declaration
 
 ```
-public PseudoBodyProcessor Processor { get; protected set; }
+public PseudoBodyProcessor Processor { get; set; }
 ```
 
 #### Source
@@ -230,6 +279,28 @@ public float SourceThickness { get; set; }
 protected virtual void Awake()
 ```
 
+#### CheckWillDiverge(Vector3)
+
+Checks to see if the given position will cause a divergence between the Facade.Source and the Facade.Offset to the Character.
+
+##### Declaration
+
+```
+public virtual bool CheckWillDiverge(Vector3 targetPosition)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | targetPosition | The new position to check for. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Boolean | Whether a divergence will occur. |
+
 #### ClearOffset()
 
 Clears [Offset].
@@ -250,6 +321,22 @@ Clears [Source].
 public virtual void ClearSource()
 ```
 
+#### DoCheckWillDiverge(Vector3)
+
+Checks to see if the given position will cause a divergence between the Facade.Source and the Facade.Offset to the Character.
+
+##### Declaration
+
+```
+public virtual void DoCheckWillDiverge(Vector3 targetPosition)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | targetPosition | The new position to check for. |
+
 #### ListenToRigidbodyMovement()
 
 Sets the source of truth for movement to come from [PhysicsBody] until [Character] hits the ground, then [Character] is the new source of truth.
@@ -264,6 +351,16 @@ public virtual void ListenToRigidbodyMovement()
 
 This method needs to be called right before or right after applying any form of movement to the Rigidbody while the body is grounded, i.e. in the same frame and before [Process()] is called.
 
+#### OnAfterCharacterRadiusChange()
+
+Called after [CharacterRadius] has been changed.
+
+##### Declaration
+
+```
+protected virtual void OnAfterCharacterRadiusChange()
+```
+
 #### OnAfterOffsetChange()
 
 Called after [Offset] has been changed.
@@ -274,6 +371,16 @@ Called after [Offset] has been changed.
 protected virtual void OnAfterOffsetChange()
 ```
 
+#### OnAfterPreventEnterGeometryChange()
+
+Called after [PreventEnterGeometry] has been changed.
+
+##### Declaration
+
+```
+protected virtual void OnAfterPreventEnterGeometryChange()
+```
+
 #### OnAfterSourceChange()
 
 Called after [Source] has been changed.
@@ -282,6 +389,16 @@ Called after [Source] has been changed.
 
 ```
 protected virtual void OnAfterSourceChange()
+```
+
+#### ResolveDivergence()
+
+Resolves any divergence between the Character position and the actual position of the Facade.Source and Facade.Offset.
+
+##### Declaration
+
+```
+public virtual void ResolveDivergence()
 ```
 
 #### SetSourceDivergenceThresholdX(Single)
@@ -370,7 +487,9 @@ If body collisions should be prevented this method needs to be called right befo
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
 [Process()]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Process
+[CharacterRadius]: PseudoBodyFacade.md#CharacterRadius
 [Offset]: PseudoBodyFacade.md#Offset
+[PreventEnterGeometry]: PseudoBodyFacade.md#PreventEnterGeometry
 [Source]: PseudoBodyFacade.md#Source
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
 [SourceDivergenceThreshold]: PseudoBodyFacade.md#SourceDivergenceThreshold
@@ -385,7 +504,10 @@ If body collisions should be prevented this method needs to be called right befo
 [Converged]: #Converged
 [Diverged]: #Diverged
 [StillDiverged]: #StillDiverged
+[WillDiverge]: #WillDiverge
 [Properties]: #Properties
+[CharacterRadius]: #CharacterRadius
+[ExternalPositionMutators]: #ExternalPositionMutators
 [IgnoredGameObjects]: #IgnoredGameObjects
 [IgnoredInteractors]: #IgnoredInteractors
 [Interest]: #Interest
@@ -393,17 +515,23 @@ If body collisions should be prevented this method needs to be called right befo
 [IsDiverged]: #IsDiverged
 [Offset]: #Offset
 [PhysicsBody]: #PhysicsBody
+[PreventEnterGeometry]: #PreventEnterGeometry
 [Processor]: #Processor
 [Source]: #Source
 [SourceDivergenceThreshold]: #SourceDivergenceThreshold
 [SourceThickness]: #SourceThickness
 [Methods]: #Methods
 [Awake()]: #Awake
+[CheckWillDiverge(Vector3)]: #CheckWillDivergeVector3
 [ClearOffset()]: #ClearOffset
 [ClearSource()]: #ClearSource
+[DoCheckWillDiverge(Vector3)]: #DoCheckWillDivergeVector3
 [ListenToRigidbodyMovement()]: #ListenToRigidbodyMovement
+[OnAfterCharacterRadiusChange()]: #OnAfterCharacterRadiusChange
 [OnAfterOffsetChange()]: #OnAfterOffsetChange
+[OnAfterPreventEnterGeometryChange()]: #OnAfterPreventEnterGeometryChange
 [OnAfterSourceChange()]: #OnAfterSourceChange
+[ResolveDivergence()]: #ResolveDivergence
 [SetSourceDivergenceThresholdX(Single)]: #SetSourceDivergenceThresholdXSingle
 [SetSourceDivergenceThresholdY(Single)]: #SetSourceDivergenceThresholdYSingle
 [SetSourceDivergenceThresholdZ(Single)]: #SetSourceDivergenceThresholdZSingle

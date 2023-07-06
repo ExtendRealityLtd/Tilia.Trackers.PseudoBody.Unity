@@ -8,20 +8,28 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
 * [Namespace]
 * [Syntax]
 * [Fields]
+  * [allowMutateActions]
   * [checkDivergedAtEndOfFrameRoutine]
   * [collisionResolutionMovement]
   * [doSnapToSource]
   * [ignoredColliders]
   * [ignoreInteractorCollisions]
   * [offsetObjectFollower]
+  * [preventMutateActions]
+  * [previousCharacterControllerPosition]
+  * [previousOffsetPosition]
   * [previousRigidbodyPosition]
   * [restoreColliders]
   * [rigidbodySetFrameCount]
+  * [smoothDampVelocity]
   * [sourceObjectFollower]
   * [wasCharacterControllerGrounded]
   * [wasDiverged]
 * [Properties]
+  * [AliasMovementDuration]
   * [Character]
+  * [CharacterCenter]
+  * [CollisionMovementDuration]
   * [CollisionsToIgnore]
   * [CurrentDivergenceState]
   * [Facade]
@@ -32,25 +40,35 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [RigidbodyCollider]
   * [UpdateSourcePosition]
 * [Methods]
+  * [AddPositionMutator(GameObject)]
   * [Awake()]
   * [CheckDivergence()]
   * [CheckDivergenceAtEndOfFrame()]
+  * [CheckForSurroundingCollisions(Vector3, Single)]
   * [CheckIfCharacterControllerIsGrounded()]
+  * [CheckWillDiverge(Vector3)]
+  * [ConfigureCharacterRadius()]
   * [ConfigureOffsetObjectFollower()]
   * [ConfigureSourceObjectFollower()]
+  * [DoCheckWillDiverge(Vector3)]
   * [EmitIsGroundedChangedEvent(Boolean)]
+  * [GetCharacterPosition(Vector3, out Single)]
   * [GetDivergenceState()]
   * [GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade>)]
   * [IgnoreInteractorGrabbedCollision(InteractableFacade)]
   * [IgnoreInteractorsCollisions(GameObject)]
   * [IgnoreInteractorsCollisions(InteractorFacade)]
-  * [MatchCharacterControllerWithSource(Boolean)]
+  * [MatchCharacterControllerWithSource(Vector3, Boolean)]
   * [MatchRigidbodyAndColliderWithCharacterController()]
   * [OnAfterInterestChange()]
   * [OnDisable()]
   * [OnEnable()]
   * [Process()]
+  * [ProcessObjectFollowers()]
   * [RememberCurrentPositions()]
+  * [RemovePositionMutator(GameObject)]
+  * [ResolveDivergence()]
+  * [ResolveDivergence(Vector3)]
   * [ResumeInteractorsCollisions(GameObject)]
   * [ResumeInteractorsCollisions(InteractorFacade)]
   * [ResumeInteractorUngrabbedCollision(InteractableFacade)]
@@ -58,6 +76,15 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [SnapToSource()]
   * [SolveBodyCollisions()]
   * [StopCheckDivergenceAtEndOfFrameRoutine()]
+  * [TryGetMutator(GameObject, out TransformPositionMutator)]
+  * [UpdateAliasForCollision()]
+  * [UpdateAliasForDivergence()]
+  * [UpdateAliasForNonCharacterControllerInterest()]
+  * [UpdateAliasForRigidbodyControllerInterest(out Vector3)]
+  * [UpdateAliasForVerticalMovement(Boolean, Vector3)]
+  * [UpdateAliasPosition(Vector3, Vector3, Boolean, Boolean, Boolean, Single)]
+  * [UpdateInterestType(Boolean, Vector3)]
+  * [WillDiverge(Vector3, Vector3)]
 * [Implements]
 
 ## Details
@@ -82,6 +109,16 @@ public class PseudoBodyProcessor : MonoBehaviour
 ```
 
 ### Fields
+
+#### allowMutateActions
+
+A collection of actions to perform on each TransformPositionMutator to allow mutations to occur.
+
+##### Declaration
+
+```
+protected Dictionary<TransformPositionMutator, UnityAction<Vector3>> allowMutateActions
+```
 
 #### checkDivergedAtEndOfFrameRoutine
 
@@ -143,6 +180,36 @@ An optional follower of [Offset].
 protected ObjectFollower offsetObjectFollower
 ```
 
+#### preventMutateActions
+
+A collection of actions to perform on each TransformPositionMutator to prevent mutations from occurring.
+
+##### Declaration
+
+```
+protected Dictionary<TransformPositionMutator, UnityAction> preventMutateActions
+```
+
+#### previousCharacterControllerPosition
+
+The previous position for the [Character].
+
+##### Declaration
+
+```
+protected Vector3 previousCharacterControllerPosition
+```
+
+#### previousOffsetPosition
+
+The previous position of the Facade.Offset.
+
+##### Declaration
+
+```
+protected Vector3 previousOffsetPosition
+```
+
 #### previousRigidbodyPosition
 
 The previous position of [PhysicsBody].
@@ -171,6 +238,16 @@ The frame count of the last time [Interest] was set to [Rigidbody] or [Rigidbody
 
 ```
 protected int rigidbodySetFrameCount
+```
+
+#### smoothDampVelocity
+
+A reference to output any smooth damp velocity to.
+
+##### Declaration
+
+```
+protected Vector3 smoothDampVelocity
 ```
 
 #### sourceObjectFollower
@@ -205,6 +282,16 @@ protected bool wasDiverged
 
 ### Properties
 
+#### AliasMovementDuration
+
+The duration to smooth damp the alias Source and Offset movement by.
+
+##### Declaration
+
+```
+public float AliasMovementDuration { get; set; }
+```
+
 #### Character
 
 The CharacterController that acts as the main representation of the body.
@@ -212,7 +299,27 @@ The CharacterController that acts as the main representation of the body.
 ##### Declaration
 
 ```
-public CharacterController Character { get; protected set; }
+public CharacterController Character { get; set; }
+```
+
+#### CharacterCenter
+
+The center of the [Character].
+
+##### Declaration
+
+```
+protected Vector3 CharacterCenter { get; }
+```
+
+#### CollisionMovementDuration
+
+The duration to smooth damp the collision resolution movement by.
+
+##### Declaration
+
+```
+public float CollisionMovementDuration { get; set; }
 ```
 
 #### CollisionsToIgnore
@@ -222,7 +329,7 @@ A CollisionIgnorer to manage ignoring collisions with the PseudoBody colliders.
 ##### Declaration
 
 ```
-public CollisionIgnorer CollisionsToIgnore { get; protected set; }
+public CollisionIgnorer CollisionsToIgnore { get; set; }
 ```
 
 #### CurrentDivergenceState
@@ -242,7 +349,7 @@ The public interface facade.
 ##### Declaration
 
 ```
-public PseudoBodyFacade Facade { get; protected set; }
+public PseudoBodyFacade Facade { get; set; }
 ```
 
 #### Interest
@@ -282,7 +389,7 @@ The Rigidbody that acts as the physical representation of the body.
 ##### Declaration
 
 ```
-public Rigidbody PhysicsBody { get; protected set; }
+public Rigidbody PhysicsBody { get; set; }
 ```
 
 #### RigidbodyCollider
@@ -292,7 +399,7 @@ The CapsuleCollider that acts as the physical collider representation of the bod
 ##### Declaration
 
 ```
-public CapsuleCollider RigidbodyCollider { get; protected set; }
+public CapsuleCollider RigidbodyCollider { get; set; }
 ```
 
 #### UpdateSourcePosition
@@ -306,6 +413,22 @@ public bool UpdateSourcePosition { get; set; }
 ```
 
 ### Methods
+
+#### AddPositionMutator(GameObject)
+
+Adds a found TransformPositionMutator found in the given GameObject.
+
+##### Declaration
+
+```
+public virtual void AddPositionMutator(GameObject mutatorContainer)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| GameObject | mutatorContainer | The container to look for the Position Mutator in. |
 
 #### Awake()
 
@@ -341,6 +464,29 @@ protected virtual IEnumerator CheckDivergenceAtEndOfFrame()
 | --- | --- |
 | System.Collections.IEnumerator | An Enumerator to manage the running of the Coroutine. |
 
+#### CheckForSurroundingCollisions(Vector3, Single)
+
+Checks for any collisions in the surrounding area.
+
+##### Declaration
+
+```
+protected virtual bool CheckForSurroundingCollisions(Vector3 center, float radius)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | center | The center point to start the spherecast check from. |
+| System.Single | radius | The radius to perform the spherecast check to. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Boolean | Whether any collisions have occcured. |
+
 #### CheckIfCharacterControllerIsGrounded()
 
 Checks whether [Character] is grounded.
@@ -360,6 +506,38 @@ protected virtual bool CheckIfCharacterControllerIsGrounded()
 ##### Remarks
 
 CharacterController.isGrounded isn't accurate so this method does an additional check using Physics.
+
+#### CheckWillDiverge(Vector3)
+
+Checks to see if the given position will cause a divergence between the Facade.Source and the Facade.Offset to the [Character].
+
+##### Declaration
+
+```
+public virtual bool CheckWillDiverge(Vector3 targetPosition)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | targetPosition | The new position to check for. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Boolean | Whether a divergence will occur. |
+
+#### ConfigureCharacterRadius()
+
+Configures the character controller and capsule collider radius based on the facade settings.
+
+##### Declaration
+
+```
+public virtual void ConfigureCharacterRadius()
+```
 
 #### ConfigureOffsetObjectFollower()
 
@@ -381,6 +559,22 @@ Configures the source object follower based on the facade settings.
 public virtual void ConfigureSourceObjectFollower()
 ```
 
+#### DoCheckWillDiverge(Vector3)
+
+Checks to see if the given position will cause a divergence between the Facade.Source and the Facade.Offset to the [Character].
+
+##### Declaration
+
+```
+public virtual void DoCheckWillDiverge(Vector3 targetPosition)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | targetPosition | The new position to check for. |
+
 #### EmitIsGroundedChangedEvent(Boolean)
 
 Emits BodyRepresentationFacade.BecameGrounded or [BecameAirborne].
@@ -396,6 +590,29 @@ protected virtual void EmitIsGroundedChangedEvent(bool isCharacterControllerGrou
 | Type | Name | Description |
 | --- | --- | --- |
 | System.Boolean | isCharacterControllerGrounded | The current state. |
+
+#### GetCharacterPosition(Vector3, out Single)
+
+Gets the position of the [Character].
+
+##### Declaration
+
+```
+protected virtual Vector3 GetCharacterPosition(Vector3 sourcePosition, out float height)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | sourcePosition | The given position of the source. |
+| System.Single | height | The calculated height of the Character. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| Vector3 | The world position of the Character. |
 
 #### GetDivergenceState()
 
@@ -484,20 +701,21 @@ public virtual void IgnoreInteractorsCollisions(InteractorFacade interactor)
 | --- | --- | --- |
 | InteractorFacade | interactor | n/a |
 
-#### MatchCharacterControllerWithSource(Boolean)
+#### MatchCharacterControllerWithSource(Vector3, Boolean)
 
 Changes the height and position of [Character] to match [Source].
 
 ##### Declaration
 
 ```
-protected virtual void MatchCharacterControllerWithSource(bool setPositionDirectly)
+protected virtual void MatchCharacterControllerWithSource(Vector3 targetPosition, bool setPositionDirectly)
 ```
 
 ##### Parameters
 
 | Type | Name | Description |
 | --- | --- | --- |
+| Vector3 | targetPosition | The position to update to. |
 | System.Boolean | setPositionDirectly | Whether to set the position directly or tell [Character] to move to it. |
 
 #### MatchRigidbodyAndColliderWithCharacterController()
@@ -546,6 +764,16 @@ Positions, sizes and controls all variables necessary to make a body representat
 public virtual void Process()
 ```
 
+#### ProcessObjectFollowers()
+
+Processes the object followers for the Facade.Source and Facade.Offset.
+
+##### Declaration
+
+```
+protected virtual void ProcessObjectFollowers()
+```
+
 #### RememberCurrentPositions()
 
 Updates the previous position variables to remember the current state.
@@ -555,6 +783,48 @@ Updates the previous position variables to remember the current state.
 ```
 protected virtual void RememberCurrentPositions()
 ```
+
+#### RemovePositionMutator(GameObject)
+
+Removes a found TransformPositionMutator found in the given GameObject.
+
+##### Declaration
+
+```
+public virtual void RemovePositionMutator(GameObject mutatorContainer)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| GameObject | mutatorContainer | The container to look for the Position Mutator in. |
+
+#### ResolveDivergence()
+
+Resolves any divergence between the [Character] position and the actual position of the Facade.Source and Facade.Offset.
+
+##### Declaration
+
+```
+public virtual void ResolveDivergence()
+```
+
+#### ResolveDivergence(Vector3)
+
+Resolves any divergence between the [Character] position and the actual position of the Facade.Source and Facade.Offset.
+
+##### Declaration
+
+```
+public virtual void ResolveDivergence(Vector3 divergedPosition)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | divergedPosition | The diverged position. |
 
 #### ResumeInteractorsCollisions(GameObject)
 
@@ -649,6 +919,159 @@ Stops the divergence check coroutine from running.
 protected virtual void StopCheckDivergenceAtEndOfFrameRoutine()
 ```
 
+#### TryGetMutator(GameObject, out TransformPositionMutator)
+
+Attempts to get the TransformPositionMutator component nested within the given GameObject.
+
+##### Declaration
+
+```
+protected virtual bool TryGetMutator(GameObject mutatorContainer, out TransformPositionMutator mutator)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| GameObject | mutatorContainer | The container to look for the component in. |
+| TransformPositionMutator | mutator | The found mutator. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Boolean | Whether a mutator has been found. |
+
+#### UpdateAliasForCollision()
+
+Updates the alias targets to resolve any collisions.
+
+##### Declaration
+
+```
+protected virtual void UpdateAliasForCollision()
+```
+
+#### UpdateAliasForDivergence()
+
+Updates the alias targets to resolve any divergence.
+
+##### Declaration
+
+```
+protected virtual void UpdateAliasForDivergence()
+```
+
+#### UpdateAliasForNonCharacterControllerInterest()
+
+Updates the alias targets for when the [PseudoBodyProcessor.MovementInterest] is not of type CharacterController.
+
+##### Declaration
+
+```
+protected virtual void UpdateAliasForNonCharacterControllerInterest()
+```
+
+#### UpdateAliasForRigidbodyControllerInterest(out Vector3)
+
+Updates the alias targets for when the [PseudoBodyProcessor.MovementInterest] is of a Rigidbody type.
+
+##### Declaration
+
+```
+protected virtual Vector3 UpdateAliasForRigidbodyControllerInterest(out Vector3 rigidbodyPhysicsMovement)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | rigidbodyPhysicsMovement | The calculated Rigidbody movement position. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| Vector3 | The current [Character] movement position. |
+
+#### UpdateAliasForVerticalMovement(Boolean, Vector3)
+
+Updates the alias targets for any vertical movement.
+
+##### Declaration
+
+```
+protected virtual void UpdateAliasForVerticalMovement(bool isGrounded, Vector3 characterControllerSourceMovement)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Boolean | isGrounded | Whether the controller is touching the ground. |
+| Vector3 | characterControllerSourceMovement | The calculated [Character] movement position. |
+
+#### UpdateAliasPosition(Vector3, Vector3, Boolean, Boolean, Boolean, Single)
+
+Updates the position of the alias objects.
+
+##### Declaration
+
+```
+protected virtual void UpdateAliasPosition(Vector3 newOffsetPosition, Vector3 newSourcePosition, bool incrementOffset, bool incrementSource, bool ignoreSourcePosition, float dampDuration)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | newOffsetPosition | The new position for the Facade.Offset. |
+| Vector3 | newSourcePosition | The new position for the Facade.Source. |
+| System.Boolean | incrementOffset | Whether to increment the Facade.Offset position or set it to a new value. |
+| System.Boolean | incrementSource | Whether to increment the Facade.Source position or set it to a new value. |
+| System.Boolean | ignoreSourcePosition | Whether to ignore setting the Facade.Source position. |
+| System.Single | dampDuration | The duration to dampen the movemnt of the position updates. |
+
+#### UpdateInterestType(Boolean, Vector3)
+
+Updates the [PseudoBodyProcessor.MovementInterest] type based on whether the controller is grounded or not.
+
+##### Declaration
+
+```
+protected virtual void UpdateInterestType(bool isGrounded, Vector3 rigidbodyPhysicsMovement)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Boolean | isGrounded | Whether the controller is touching the ground. |
+| Vector3 | rigidbodyPhysicsMovement | The calculated Rigidbody movement position. |
+
+#### WillDiverge(Vector3, Vector3)
+
+Determines whether the given position will diverge from the [Character] position.
+
+##### Declaration
+
+```
+protected virtual bool WillDiverge(Vector3 targetPosition, Vector3 divergenceThreshold)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| Vector3 | targetPosition | The position to check. |
+| Vector3 | divergenceThreshold | The threshold in which to consider a divergence has occurred. |
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Boolean | Whether there was a divergence between the two positions. |
+
 ### Implements
 
 IProcessable
@@ -657,6 +1080,7 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [Offset]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Offset
+[Character]: PseudoBodyProcessor.md#Character
 [PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
 [Interest]: PseudoBodyProcessor.md#Interest
 [Rigidbody]: PseudoBodyProcessor.MovementInterest.md#MovementInterest_Rigidbody
@@ -664,8 +1088,10 @@ IProcessable
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
+[Character]: PseudoBodyProcessor.md#Character
 [PseudoBodyFacade]: PseudoBodyFacade.md
-[PseudoBodyProcessor.MovementInterest]: PseudoBodyProcessor.MovementInterest.md
+[Character]: PseudoBodyProcessor.md#Character
+[Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
@@ -673,6 +1099,7 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [BecameAirborne]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_BecameAirborne
+[Character]: PseudoBodyProcessor.md#Character
 [PseudoBodyProcessor.DivergenceState]: PseudoBodyProcessor.DivergenceState.md
 [Character]: PseudoBodyProcessor.md#Character
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
@@ -683,26 +1110,40 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Interest]: PseudoBodyProcessor.md#Interest
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
+[Character]: PseudoBodyProcessor.md#Character
+[Character]: PseudoBodyProcessor.md#Character
 [PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
+[Character]: PseudoBodyProcessor.md#Character
+[Character]: PseudoBodyProcessor.md#Character
+[Character]: PseudoBodyProcessor.md#Character
+[PseudoBodyProcessor.MovementInterest]: PseudoBodyProcessor.MovementInterest.md
 [Character]: PseudoBodyProcessor.md#Character
 [Inheritance]: #Inheritance
 [Namespace]: #Namespace
 [Syntax]: #Syntax
 [Fields]: #Fields
+[allowMutateActions]: #allowMutateActions
 [checkDivergedAtEndOfFrameRoutine]: #checkDivergedAtEndOfFrameRoutine
 [collisionResolutionMovement]: #collisionResolutionMovement
 [doSnapToSource]: #doSnapToSource
 [ignoredColliders]: #ignoredColliders
 [ignoreInteractorCollisions]: #ignoreInteractorCollisions
 [offsetObjectFollower]: #offsetObjectFollower
+[preventMutateActions]: #preventMutateActions
+[previousCharacterControllerPosition]: #previousCharacterControllerPosition
+[previousOffsetPosition]: #previousOffsetPosition
 [previousRigidbodyPosition]: #previousRigidbodyPosition
 [restoreColliders]: #restoreColliders
 [rigidbodySetFrameCount]: #rigidbodySetFrameCount
+[smoothDampVelocity]: #smoothDampVelocity
 [sourceObjectFollower]: #sourceObjectFollower
 [wasCharacterControllerGrounded]: #wasCharacterControllerGrounded
 [wasDiverged]: #wasDiverged
 [Properties]: #Properties
+[AliasMovementDuration]: #AliasMovementDuration
 [Character]: #Character
+[CharacterCenter]: #CharacterCenter
+[CollisionMovementDuration]: #CollisionMovementDuration
 [CollisionsToIgnore]: #CollisionsToIgnore
 [CurrentDivergenceState]: #CurrentDivergenceState
 [Facade]: #Facade
@@ -713,25 +1154,35 @@ IProcessable
 [RigidbodyCollider]: #RigidbodyCollider
 [UpdateSourcePosition]: #UpdateSourcePosition
 [Methods]: #Methods
+[AddPositionMutator(GameObject)]: #AddPositionMutatorGameObject
 [Awake()]: #Awake
 [CheckDivergence()]: #CheckDivergence
 [CheckDivergenceAtEndOfFrame()]: #CheckDivergenceAtEndOfFrame
+[CheckForSurroundingCollisions(Vector3, Single)]: #CheckForSurroundingCollisionsVector3-Single
 [CheckIfCharacterControllerIsGrounded()]: #CheckIfCharacterControllerIsGrounded
+[CheckWillDiverge(Vector3)]: #CheckWillDivergeVector3
+[ConfigureCharacterRadius()]: #ConfigureCharacterRadius
 [ConfigureOffsetObjectFollower()]: #ConfigureOffsetObjectFollower
 [ConfigureSourceObjectFollower()]: #ConfigureSourceObjectFollower
+[DoCheckWillDiverge(Vector3)]: #DoCheckWillDivergeVector3
 [EmitIsGroundedChangedEvent(Boolean)]: #EmitIsGroundedChangedEventBoolean
+[GetCharacterPosition(Vector3, out Single)]: #GetCharacterPositionVector3-out Single
 [GetDivergenceState()]: #GetDivergenceState
 [GetGameObjectListFromInteractorFacadeList(IReadOnlyList<InteractorFacade>)]: #GetGameObjectListFromInteractorFacadeListIReadOnlyList<InteractorFacade>
 [IgnoreInteractorGrabbedCollision(InteractableFacade)]: #IgnoreInteractorGrabbedCollisionInteractableFacade
 [IgnoreInteractorsCollisions(GameObject)]: #IgnoreInteractorsCollisionsGameObject
 [IgnoreInteractorsCollisions(InteractorFacade)]: #IgnoreInteractorsCollisionsInteractorFacade
-[MatchCharacterControllerWithSource(Boolean)]: #MatchCharacterControllerWithSourceBoolean
+[MatchCharacterControllerWithSource(Vector3, Boolean)]: #MatchCharacterControllerWithSourceVector3-Boolean
 [MatchRigidbodyAndColliderWithCharacterController()]: #MatchRigidbodyAndColliderWithCharacterController
 [OnAfterInterestChange()]: #OnAfterInterestChange
 [OnDisable()]: #OnDisable
 [OnEnable()]: #OnEnable
 [Process()]: #Process
+[ProcessObjectFollowers()]: #ProcessObjectFollowers
 [RememberCurrentPositions()]: #RememberCurrentPositions
+[RemovePositionMutator(GameObject)]: #RemovePositionMutatorGameObject
+[ResolveDivergence()]: #ResolveDivergence
+[ResolveDivergence(Vector3)]: #ResolveDivergenceVector3
 [ResumeInteractorsCollisions(GameObject)]: #ResumeInteractorsCollisionsGameObject
 [ResumeInteractorsCollisions(InteractorFacade)]: #ResumeInteractorsCollisionsInteractorFacade
 [ResumeInteractorUngrabbedCollision(InteractableFacade)]: #ResumeInteractorUngrabbedCollisionInteractableFacade
@@ -739,4 +1190,13 @@ IProcessable
 [SnapToSource()]: #SnapToSource
 [SolveBodyCollisions()]: #SolveBodyCollisions
 [StopCheckDivergenceAtEndOfFrameRoutine()]: #StopCheckDivergenceAtEndOfFrameRoutine
+[TryGetMutator(GameObject, out TransformPositionMutator)]: #TryGetMutatorGameObject-out TransformPositionMutator
+[UpdateAliasForCollision()]: #UpdateAliasForCollision
+[UpdateAliasForDivergence()]: #UpdateAliasForDivergence
+[UpdateAliasForNonCharacterControllerInterest()]: #UpdateAliasForNonCharacterControllerInterest
+[UpdateAliasForRigidbodyControllerInterest(out Vector3)]: #UpdateAliasForRigidbodyControllerInterestout Vector3
+[UpdateAliasForVerticalMovement(Boolean, Vector3)]: #UpdateAliasForVerticalMovementBoolean-Vector3
+[UpdateAliasPosition(Vector3, Vector3, Boolean, Boolean, Boolean, Single)]: #UpdateAliasPositionVector3-Vector3-Boolean-Boolean-Boolean-Single
+[UpdateInterestType(Boolean, Vector3)]: #UpdateInterestTypeBoolean-Vector3
+[WillDiverge(Vector3, Vector3)]: #WillDivergeVector3-Vector3
 [Implements]: #Implements
