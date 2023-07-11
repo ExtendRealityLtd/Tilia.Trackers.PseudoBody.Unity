@@ -203,6 +203,10 @@
         /// Emitted when the body stops touching ground.
         /// </summary>
         public UnityEvent BecameAirborne = new UnityEvent();
+        /// <summary>
+        /// Emitted when a jump is initiated.
+        /// </summary>
+        public UnityEvent Jumped = new UnityEvent();
         #endregion
 
         #region Reference Settings
@@ -387,6 +391,26 @@
         public virtual void ResolveDivergence()
         {
             Processor.ResolveDivergence();
+        }
+
+        /// <summary>
+        /// Adds force to the <see cref="PhysicsBody"/> to simulate a jump at the given force.
+        /// </summary>
+        /// <param name="force">The force to jump by.</param>
+        public virtual void Jump(float force)
+        {
+            if (!Processor.IsGrounded)
+            {
+                return;
+            }
+
+            if(Processor.IsDiverged)
+            {
+                Debug.Log("wee");
+            }
+
+            Processor.AddForce(force);
+            Jumped?.Invoke();
         }
 
         protected virtual void Awake()

@@ -145,6 +145,44 @@
         }
         #endregion
 
+        #region Force Settings
+        [Header("Force Settings")]
+        [Tooltip("The direction to apply the force to on the `AddForce` method.")]
+        [SerializeField]
+        private Vector3 forceDirection = Vector3.up;
+        /// <summary>
+        /// The direction to apply the force to on the `AddForce` method.
+        /// </summary>
+        public Vector3 ForceDirection
+        {
+            get
+            {
+                return forceDirection;
+            }
+            set
+            {
+                forceDirection = value;
+            }
+        }
+        [Tooltip("The ForceMode to apply the force to on the `AddForce` method.")]
+        [SerializeField]
+        private ForceMode forceType;
+        /// <summary>
+        /// The <see cref="ForceMode"/> to apply the force to on the `AddForce` method.
+        /// </summary>
+        public ForceMode ForceType
+        {
+            get
+            {
+                return forceType;
+            }
+            set
+            {
+                forceType = value;
+            }
+        }
+        #endregion
+
         #region Reference Settings
         [Header("Reference Settings")]
         [Tooltip("The CharacterController that acts as the main representation of the body.")]
@@ -252,6 +290,10 @@
         /// </summary>
         public virtual bool IsCharacterControllerGrounded => wasCharacterControllerGrounded == true;
         /// <summary>
+        /// Whether the PseudoBody is grounded using a detailed ground check.
+        /// </summary>
+        public virtual bool IsGrounded => CheckIfCharacterControllerIsGrounded();
+        /// <summary>
         /// Whether <see cref="Facade.Source"/> has diverged from the <see cref="Character"/>.
         /// </summary>
         public virtual bool IsDiverged { get; protected set; }
@@ -312,6 +354,14 @@
         /// The routine for checking to see if the <see cref="Facade.Source"/> is still diverged with the <see cref="Character"/> at the end of the frame.
         /// </summary>
         protected Coroutine checkDivergedAtEndOfFrameRoutine;
+        /// <summary>
+        /// The routine for resetting the <see cref="Interest"/> to <see cref="MovementInterest.RigidbodyUntilGrounded"/> after a force is added.
+        /// </summary>
+        protected Coroutine resetInterestAfterAddForceRoutine;
+        /// <summary>
+        /// A <see cref="YieldInstruction"/> that waits for the end of the fixed update process.
+        /// </summary>
+        protected YieldInstruction waitForEndOfFixedUpdate = new WaitForFixedUpdate();
         /// <summary>
         /// Whether to snap the dependents to the <see cref="Facade.Source"/> without any divergent checking.
         /// </summary>
@@ -432,6 +482,23 @@
         public virtual void ResolveDivergence(Vector3 divergedPosition)
         {
             ResolveDivergence();
+        }
+
+        /// <summary>
+        /// Adds a force to the <see cref="PhysicsBody"/> in the <see cref="ForceDirection"/> using the <see cref="ForceType"/>.
+        /// </summary>
+        /// <param name="power">The amount of force to apply in the <see cref="forceDirection"/>.</param>
+        public virtual void AddForce(float power)
+        {
+            if (PhysicsBody == null)
+            {
+                return;
+            }
+
+            Interest = MovementInterest.Rigidbody;
+            PhysicsBody.AddForce(power * ForceDirection, ForceType);
+            StopResetInterestAfterForceRoutine();
+            resetInterestAfterAddForceRoutine = StartCoroutine(ResetInterestAfterForce());
         }
 
         /// <summary>
@@ -568,6 +635,7 @@
         protected virtual void OnDisable()
         {
             StopCheckDivergenceAtEndOfFrameRoutine();
+            StopResetInterestAfterForceRoutine();
             sourceObjectFollower = null;
             offsetObjectFollower = null;
         }
@@ -1000,7 +1068,7 @@
         /// <returns>An Enumerator to manage the running of the Coroutine.</returns>
         protected virtual IEnumerator CheckDivergenceAtEndOfFrame()
         {
-            yield return new WaitForFixedUpdate();
+            yield return waitForEndOfFixedUpdate;
             if (IsDiverged)
             {
                 Facade.StillDiverged?.Invoke();
@@ -1018,6 +1086,28 @@
             {
                 StopCoroutine(checkDivergedAtEndOfFrameRoutine);
                 checkDivergedAtEndOfFrameRoutine = null;
+            }
+        }
+
+        /// <summary>
+        /// Resets the <see cref="Interest"/> back to <see cref="MovementInterest.RigidbodyUntilGrounded"/> after a force is applied to the <see cref="PhysicsBody"/>.
+        /// </summary>
+        /// <returns>An Enumerator to manage the running of the Coroutine.</returns>
+        protected IEnumerator ResetInterestAfterForce()
+        {
+            yield return new WaitForFixedUpdate();
+            Interest = MovementInterest.RigidbodyUntilGrounded;
+        }
+
+        /// <summary>
+        /// Stops the reset interest after force coroutine from running.
+        /// </summary>
+        protected virtual void StopResetInterestAfterForceRoutine()
+        {
+            if (resetInterestAfterAddForceRoutine != null)
+            {
+                StopCoroutine(resetInterestAfterAddForceRoutine);
+                resetInterestAfterAddForceRoutine = null;
             }
         }
 
