@@ -12,6 +12,7 @@ The public interface for the PseudoBody prefab.
   * [BecameGrounded]
   * [Converged]
   * [Diverged]
+  * [Jumped]
   * [StillDiverged]
   * [WillDiverge]
 * [Properties]
@@ -35,6 +36,7 @@ The public interface for the PseudoBody prefab.
   * [ClearOffset()]
   * [ClearSource()]
   * [DoCheckWillDiverge(Vector3)]
+  * [Jump(Single)]
   * [ListenToRigidbodyMovement()]
   * [OnAfterCharacterRadiusChange()]
   * [OnAfterOffsetChange()]
@@ -104,6 +106,16 @@ Emitted when the pseudo body starts no longer being within the threshold distanc
 
 ```
 public UnityEvent Diverged
+```
+
+#### Jumped
+
+Emitted when a jump is initiated.
+
+##### Declaration
+
+```
+public UnityEvent Jumped
 ```
 
 #### StillDiverged
@@ -337,6 +349,22 @@ public virtual void DoCheckWillDiverge(Vector3 targetPosition)
 | --- | --- | --- |
 | Vector3 | targetPosition | The new position to check for. |
 
+#### Jump(Single)
+
+Adds force to the [PhysicsBody] to simulate a jump at the given force.
+
+##### Declaration
+
+```
+public virtual void Jump(float force)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Single | force | The force to jump by. |
+
 #### ListenToRigidbodyMovement()
 
 Sets the source of truth for movement to come from [PhysicsBody] until [Character] hits the ground, then [Character] is the new source of truth.
@@ -483,6 +511,7 @@ If body collisions should be prevented this method needs to be called right befo
 [Source]: PseudoBodyFacade.md#Source
 [Offset]: PseudoBodyFacade.md#Offset
 [Source]: PseudoBodyFacade.md#Source
+[PhysicsBody]: PseudoBodyFacade.md#PhysicsBody
 [PhysicsBody]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_PhysicsBody
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
 [Character]: PseudoBodyProcessor.md#Tilia_Trackers_PseudoBody_PseudoBodyProcessor_Character
@@ -503,6 +532,7 @@ If body collisions should be prevented this method needs to be called right befo
 [BecameGrounded]: #BecameGrounded
 [Converged]: #Converged
 [Diverged]: #Diverged
+[Jumped]: #Jumped
 [StillDiverged]: #StillDiverged
 [WillDiverge]: #WillDiverge
 [Properties]: #Properties
@@ -526,6 +556,7 @@ If body collisions should be prevented this method needs to be called right befo
 [ClearOffset()]: #ClearOffset
 [ClearSource()]: #ClearSource
 [DoCheckWillDiverge(Vector3)]: #DoCheckWillDivergeVector3
+[Jump(Single)]: #JumpSingle
 [ListenToRigidbodyMovement()]: #ListenToRigidbodyMovement
 [OnAfterCharacterRadiusChange()]: #OnAfterCharacterRadiusChange
 [OnAfterOffsetChange()]: #OnAfterOffsetChange

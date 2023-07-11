@@ -454,6 +454,8 @@ MonoBehaviour:
   updateSourcePosition: 1
   aliasMovementDuration: 0
   collisionMovementDuration: 0
+  forceDirection: {x: 0, y: 1, z: 0}
+  forceType: 0
   character: {fileID: 883720338106885674}
   physicsBody: {fileID: 4655073129495598539}
   rigidbodyCollider: {fileID: 1290236144137004063}

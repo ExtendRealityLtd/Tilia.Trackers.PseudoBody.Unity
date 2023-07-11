@@ -19,10 +19,12 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [previousCharacterControllerPosition]
   * [previousOffsetPosition]
   * [previousRigidbodyPosition]
+  * [resetInterestAfterAddForceRoutine]
   * [restoreColliders]
   * [rigidbodySetFrameCount]
   * [smoothDampVelocity]
   * [sourceObjectFollower]
+  * [waitForEndOfFixedUpdate]
   * [wasCharacterControllerGrounded]
   * [wasDiverged]
 * [Properties]
@@ -33,13 +35,17 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [CollisionsToIgnore]
   * [CurrentDivergenceState]
   * [Facade]
+  * [ForceDirection]
+  * [ForceType]
   * [Interest]
   * [IsCharacterControllerGrounded]
   * [IsDiverged]
+  * [IsGrounded]
   * [PhysicsBody]
   * [RigidbodyCollider]
   * [UpdateSourcePosition]
 * [Methods]
+  * [AddForce(Single)]
   * [AddPositionMutator(GameObject)]
   * [Awake()]
   * [CheckDivergence()]
@@ -67,6 +73,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [ProcessObjectFollowers()]
   * [RememberCurrentPositions()]
   * [RemovePositionMutator(GameObject)]
+  * [ResetInterestAfterForce()]
   * [ResolveDivergence()]
   * [ResolveDivergence(Vector3)]
   * [ResumeInteractorsCollisions(GameObject)]
@@ -76,6 +83,7 @@ Sets up the PseudoBody prefab based on the provided user settings and implements
   * [SnapToSource()]
   * [SolveBodyCollisions()]
   * [StopCheckDivergenceAtEndOfFrameRoutine()]
+  * [StopResetInterestAfterForceRoutine()]
   * [TryGetMutator(GameObject, out TransformPositionMutator)]
   * [UpdateAliasForCollision()]
   * [UpdateAliasForDivergence()]
@@ -220,6 +228,16 @@ The previous position of [PhysicsBody].
 protected Vector3 previousRigidbodyPosition
 ```
 
+#### resetInterestAfterAddForceRoutine
+
+The routine for resetting the [Interest] to [RigidbodyUntilGrounded] after a force is added.
+
+##### Declaration
+
+```
+protected Coroutine resetInterestAfterAddForceRoutine
+```
+
 #### restoreColliders
 
 The colliders to restore after an ungrab.
@@ -258,6 +276,16 @@ An optional follower of [Source].
 
 ```
 protected ObjectFollower sourceObjectFollower
+```
+
+#### waitForEndOfFixedUpdate
+
+A YieldInstruction that waits for the end of the fixed update process.
+
+##### Declaration
+
+```
+protected YieldInstruction waitForEndOfFixedUpdate
 ```
 
 #### wasCharacterControllerGrounded
@@ -352,6 +380,26 @@ The public interface facade.
 public PseudoBodyFacade Facade { get; set; }
 ```
 
+#### ForceDirection
+
+The direction to apply the force to on the `AddForce` method.
+
+##### Declaration
+
+```
+public Vector3 ForceDirection { get; set; }
+```
+
+#### ForceType
+
+The ForceMode to apply the force to on the `AddForce` method.
+
+##### Declaration
+
+```
+public ForceMode ForceType { get; set; }
+```
+
 #### Interest
 
 The object that defines the main source of truth for movement.
@@ -380,6 +428,16 @@ Whether Facade.Source has diverged from the [Character].
 
 ```
 public virtual bool IsDiverged { get; protected set; }
+```
+
+#### IsGrounded
+
+Whether the PseudoBody is grounded using a detailed ground check.
+
+##### Declaration
+
+```
+public virtual bool IsGrounded { get; }
 ```
 
 #### PhysicsBody
@@ -413,6 +471,22 @@ public bool UpdateSourcePosition { get; set; }
 ```
 
 ### Methods
+
+#### AddForce(Single)
+
+Adds a force to the [PhysicsBody] in the [ForceDirection] using the [ForceType].
+
+##### Declaration
+
+```
+public virtual void AddForce(float power)
+```
+
+##### Parameters
+
+| Type | Name | Description |
+| --- | --- | --- |
+| System.Single | power | The amount of force to apply in the Tilia.Trackers.PseudoBody.PseudoBodyProcessor.forceDirection. |
 
 #### AddPositionMutator(GameObject)
 
@@ -800,6 +874,22 @@ public virtual void RemovePositionMutator(GameObject mutatorContainer)
 | --- | --- | --- |
 | GameObject | mutatorContainer | The container to look for the Position Mutator in. |
 
+#### ResetInterestAfterForce()
+
+Resets the [Interest] back to [RigidbodyUntilGrounded] after a force is applied to the [PhysicsBody].
+
+##### Declaration
+
+```
+protected IEnumerator ResetInterestAfterForce()
+```
+
+##### Returns
+
+| Type | Description |
+| --- | --- |
+| System.Collections.IEnumerator | An Enumerator to manage the running of the Coroutine. |
+
 #### ResolveDivergence()
 
 Resolves any divergence between the [Character] position and the actual position of the Facade.Source and Facade.Offset.
@@ -917,6 +1007,16 @@ Stops the divergence check coroutine from running.
 
 ```
 protected virtual void StopCheckDivergenceAtEndOfFrameRoutine()
+```
+
+#### StopResetInterestAfterForceRoutine()
+
+Stops the reset interest after force coroutine from running.
+
+##### Declaration
+
+```
+protected virtual void StopResetInterestAfterForceRoutine()
 ```
 
 #### TryGetMutator(GameObject, out TransformPositionMutator)
@@ -1083,6 +1183,8 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
 [Interest]: PseudoBodyProcessor.md#Interest
+[RigidbodyUntilGrounded]: PseudoBodyProcessor.MovementInterest.md#MovementInterest_RigidbodyUntilGrounded
+[Interest]: PseudoBodyProcessor.md#Interest
 [Rigidbody]: PseudoBodyProcessor.MovementInterest.md#MovementInterest_Rigidbody
 [RigidbodyUntilGrounded]: PseudoBodyProcessor.MovementInterest.md#MovementInterest_RigidbodyUntilGrounded
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
@@ -1092,6 +1194,9 @@ IProcessable
 [PseudoBodyFacade]: PseudoBodyFacade.md
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
+[PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
+[ForceDirection]: PseudoBodyProcessor.md#ForceDirection
+[ForceType]: PseudoBodyProcessor.md#ForceType
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
@@ -1110,6 +1215,9 @@ IProcessable
 [Character]: PseudoBodyProcessor.md#Character
 [Interest]: PseudoBodyProcessor.md#Interest
 [Source]: PseudoBodyFacade.md#Tilia_Trackers_PseudoBody_PseudoBodyFacade_Source
+[Interest]: PseudoBodyProcessor.md#Interest
+[RigidbodyUntilGrounded]: PseudoBodyProcessor.MovementInterest.md#MovementInterest_RigidbodyUntilGrounded
+[PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
 [Character]: PseudoBodyProcessor.md#Character
 [Character]: PseudoBodyProcessor.md#Character
 [PhysicsBody]: PseudoBodyProcessor.md#PhysicsBody
@@ -1133,10 +1241,12 @@ IProcessable
 [previousCharacterControllerPosition]: #previousCharacterControllerPosition
 [previousOffsetPosition]: #previousOffsetPosition
 [previousRigidbodyPosition]: #previousRigidbodyPosition
+[resetInterestAfterAddForceRoutine]: #resetInterestAfterAddForceRoutine
 [restoreColliders]: #restoreColliders
 [rigidbodySetFrameCount]: #rigidbodySetFrameCount
 [smoothDampVelocity]: #smoothDampVelocity
 [sourceObjectFollower]: #sourceObjectFollower
+[waitForEndOfFixedUpdate]: #waitForEndOfFixedUpdate
 [wasCharacterControllerGrounded]: #wasCharacterControllerGrounded
 [wasDiverged]: #wasDiverged
 [Properties]: #Properties
@@ -1147,13 +1257,17 @@ IProcessable
 [CollisionsToIgnore]: #CollisionsToIgnore
 [CurrentDivergenceState]: #CurrentDivergenceState
 [Facade]: #Facade
+[ForceDirection]: #ForceDirection
+[ForceType]: #ForceType
 [Interest]: #Interest
 [IsCharacterControllerGrounded]: #IsCharacterControllerGrounded
 [IsDiverged]: #IsDiverged
+[IsGrounded]: #IsGrounded
 [PhysicsBody]: #PhysicsBody
 [RigidbodyCollider]: #RigidbodyCollider
 [UpdateSourcePosition]: #UpdateSourcePosition
 [Methods]: #Methods
+[AddForce(Single)]: #AddForceSingle
 [AddPositionMutator(GameObject)]: #AddPositionMutatorGameObject
 [Awake()]: #Awake
 [CheckDivergence()]: #CheckDivergence
@@ -1181,6 +1295,7 @@ IProcessable
 [ProcessObjectFollowers()]: #ProcessObjectFollowers
 [RememberCurrentPositions()]: #RememberCurrentPositions
 [RemovePositionMutator(GameObject)]: #RemovePositionMutatorGameObject
+[ResetInterestAfterForce()]: #ResetInterestAfterForce
 [ResolveDivergence()]: #ResolveDivergence
 [ResolveDivergence(Vector3)]: #ResolveDivergenceVector3
 [ResumeInteractorsCollisions(GameObject)]: #ResumeInteractorsCollisionsGameObject
@@ -1190,6 +1305,7 @@ IProcessable
 [SnapToSource()]: #SnapToSource
 [SolveBodyCollisions()]: #SolveBodyCollisions
 [StopCheckDivergenceAtEndOfFrameRoutine()]: #StopCheckDivergenceAtEndOfFrameRoutine
+[StopResetInterestAfterForceRoutine()]: #StopResetInterestAfterForceRoutine
 [TryGetMutator(GameObject, out TransformPositionMutator)]: #TryGetMutatorGameObject-out TransformPositionMutator
 [UpdateAliasForCollision()]: #UpdateAliasForCollision
 [UpdateAliasForDivergence()]: #UpdateAliasForDivergence
