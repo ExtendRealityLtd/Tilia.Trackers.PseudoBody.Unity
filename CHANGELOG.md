@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.2.6...v2.3.0) (2023-07-11)
+
+#### Features
+
+* **Facade:** add jump method to apply jump force ([e95a007](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/e95a0076ff9e4c64deb9ff247ce6169aaee459cf))
+  > A new `Jump(force)` method has been added to the Facade that calls a new internal `AddForce(force)` method on the Processor which will add a force to the PhysicsBody (Rigidbody).
+  > 
+  > A new Jumped event has been added as well that is emitted when the `Jump` method is called.
+
 ### [2.2.6](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.2.5...v2.2.6) (2023-07-10)
 
 #### Miscellaneous Chores
