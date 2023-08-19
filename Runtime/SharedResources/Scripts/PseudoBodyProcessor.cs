@@ -444,7 +444,7 @@
         /// <returns>Whether a divergence will occur.</returns>
         public virtual bool CheckWillDiverge(Vector3 targetPosition)
         {
-            Vector3 difference = targetPosition - Facade.Offset.transform.position;
+            Vector3 difference = targetPosition - Facade.Offset.transform.localPosition;
             Vector3 position = GetCharacterPosition(Facade.Source.transform.position + difference, out float _);
             Vector3 movement = position - Character.transform.position;
             Character.Move(movement);
