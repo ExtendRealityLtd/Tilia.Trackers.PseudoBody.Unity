@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.3.1](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.3.0...v2.3.1) (2023-09-30)
+
+#### Bug Fixes
+
+* **PseudoBodyProcessor:** use offset local position for diverge test ([537d317](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/commit/537d31786abd1aab52afc7dcc21497f36391d6a3))
+  > The CheckWillDiverge method was using the offset absolute position to calculate the offset whereas it should be using the local position as the absolute position may already be offset if the TrackedAlias position is changed to anything other than `0,0,0` which would cause the character movement to be much higher than it needed to be.
+
 ## [2.3.0](https://github.com/ExtendRealityLtd/Tilia.Trackers.PseudoBody.Unity/compare/v2.2.6...v2.3.0) (2023-07-11)
 
 #### Features
